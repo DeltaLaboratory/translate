@@ -4,7 +4,9 @@ import Base64 from 'crypto-js/enc-base64';
 
 import { v4 } from 'uuid'
 
-const papagoVersion = 'v1.7.9_ee61e6111a'
+import {Translated} from "./models/papago";
+
+const version = 'v1.7.9_ee61e6111a'
 const deviceID = v4()
 
 const padAppHash = async (url: string) => {
@@ -15,7 +17,7 @@ const padAppHash = async (url: string) => {
 
 const padWebHash = (url: string) => {
     const timeStampMilli = Date.now()
-    let hash = Base64.stringify(hmacMD5(`${deviceID}\n${url}\n${timeStampMilli}`, papagoVersion))
+    let hash = Base64.stringify(hmacMD5(`${deviceID}\n${url}\n${timeStampMilli}`, version))
     return {
         'Authorization': `PPG ${deviceID}:${hash}`,
         'device-type': 'pc',
@@ -48,7 +50,7 @@ export const translate = async (text: string, source: string, target: string) =>
         },
         body: `deviceId=${deviceID}&locale=${source}&agree=false&dict=false&dictDisplay=30&honorific=${config.honorific}&instant=true&paging=false&source=${source}&target=${target}&text=${text}`
     })
-    return await res.json()
+    return await res.json() as Translated
 }
 
 export const translateImage = async (blob: Blob, source: string, target: string) => {

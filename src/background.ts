@@ -1,6 +1,6 @@
 import {detectLang, translate, translateImage} from './papago'
 
-const retry = async <T>(fn: (...arg: any[]) => Promise<T>, argument: any[], maxRetries: number): Promise<T> => {
+const retry = async <PT extends unknown[], T>(fn: (...arg: PT) => Promise<T>, maxRetries: number, argument: PT): Promise<T> => {
     let retries = 0
     while (true) {
         try {
@@ -16,19 +16,20 @@ const retry = async <T>(fn: (...arg: any[]) => Promise<T>, argument: any[], maxR
 }
 
 chrome.runtime.onMessage.addListener((request, _sender, sendResponse) => {
-    if (request.action === 'detect_lang') {
-        detectLang(request.text).then(lang => {
-            sendResponse(lang)
-        })
-        return true
+    switch (request.action) {
+        case 'detect_lang':
+            detectLang(request.text).then(lang => {
+                sendResponse(lang)
+            })
+            return true
+        case 'translate':
+            translate(request.text, request.source, request.target).then(json => {
+                sendResponse(json)
+            })
+            return true
+        default:
+            return false
     }
-    if (request.action === 'translate') {
-        translate(request.text, request.source, request.target).then(json => {
-            sendResponse(json)
-        })
-        return true
-    }
-    return false
 })
 
 chrome.contextMenus.onClicked.addListener(async (info, tab) => {
@@ -59,7 +60,7 @@ chrome.contextMenus.onClicked.addListener(async (info, tab) => {
                     },
                 }] as chrome.declarativeNetRequest.Rule[],
             });
-            let image = await retry(translateImage, [await (await fetch(imageURL.toString())).blob(), config.image_source_lang, 'ko'], 5)
+            let image = await retry(translateImage, 5, [await (await fetch(imageURL.toString())).blob(), config.image_source_lang, 'ko'])
             await chrome.tabs.sendMessage(tab!.id!, {
                 action: 'alter_image_url',
                 url: info.srcUrl,

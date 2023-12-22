@@ -1,3 +1,5 @@
+import {Translated} from "./models/papago";
+
 let lastContextPosition: { x: number, y: number } = { x: 0, y: 0 }
 
 document.addEventListener("contextmenu", function(event){
@@ -5,7 +7,7 @@ document.addEventListener("contextmenu", function(event){
     lastContextPosition = { x: rect.left, y: rect.top }
 }, true);
 
-const createTranslatedOverlay = (translated: any) => {
+const createTranslatedOverlay = (translated: Translated) => {
     const overlay = document.createElement('div')
     overlay.style.position = 'absolute'
     overlay.style.top = `${window.scrollY + lastContextPosition.y}px`
@@ -15,7 +17,7 @@ const createTranslatedOverlay = (translated: any) => {
     overlay.style.backgroundColor = 'white'
     overlay.style.border = '1px solid black'
     overlay.style.padding = '10px'
-    overlay.style.borderRadius = '5px'
+    overlay.style.borderRadius = '8px'
     overlay.style.maxWidth = '500px'
     overlay.style.maxHeight = '500px'
     overlay.style.overflow = 'auto'
