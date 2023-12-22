@@ -1,0 +1,48 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Comment Translator Config</title>
+    <style>
+      @font-face {
+        font-family: 'Pretendard-Regular';
+        src: url('https://cdn.jsdelivr.net/gh/Project-Noonnu/noonfonts_2107@1.1/Pretendard-Regular.woff') format('woff');
+        font-weight: 400;
+        font-style: normal;
+      }
+
+      body {
+        min-width:250px;
+        min-height:200px;
+
+        font-family: 'Pretendard-Regular', sans-serif;
+      }
+
+      .align-items {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="app">
+      <h3>Comment Translator Config</h3>
+      <!-- honorific switch -->
+        <div class="align-items">
+            <label for="honorific">Honorific</label>
+            <input type="checkbox" id="honorific"/>
+        </div>
+        <div class="align-items">
+            <label for="image_source_lang">Image Source Language</label>
+            <select id="image_source_lang">
+                <option value="ko">Korean</option>
+                <option value="en">English</option>
+                <option value="ja">Japanese</option>
+                <option value="zh">Chinese</option>
+            </select>
+        </div>
+    </div>
+    <script src="src/config.ts"></script>
+  </body>
+</html>

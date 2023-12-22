@@ -1,0 +1,38 @@
+{
+  "manifest_version": 3,
+  "name": "Comment Translator",
+  "description": "Translate comments on YouTube, Issue on GitHub, and more!",
+  "version": "1.0",
+  "action": {
+    "default_popup": "index.html",
+    "default_icon": {
+      "16": "resource/icon.png",
+      "24": "resource/icon.png",
+      "32": "resource/icon.png"
+    }
+  },
+  "icons": {
+    "16": "resource/icon.png",
+    "24": "resource/icon.png",
+    "32": "resource/icon.png",
+    "48": "resource/icon.png",
+    "128": "resource/icon.png"
+  },
+  "permissions": ["storage", "declarativeNetRequest", "contextMenus"],
+  "host_permissions": ["*://*.youtube.com/*", "*://*.naver.com/*", "*://*/*"],
+  "content_scripts": [
+    {
+      "matches": ["*://*.youtube.com/*"],
+      "run_at": "document_end",
+      "js": ["src/youtube.js"]
+    },
+    {
+      "matches": ["http://*/*", "https://*/*"],
+      "run_at": "document_end",
+      "js": ["src/ctx_image.ts"]
+    }
+  ],
+  "background": {
+    "service_worker": "src/background.ts"
+  }
+}

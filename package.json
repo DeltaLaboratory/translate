@@ -1,0 +1,23 @@
+{
+  "name": "comment-auto",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc && vite build",
+    "preview": "vite preview"
+  },
+  "devDependencies": {
+    "@crxjs/vite-plugin": "2.0.0-beta.21",
+    "@types/crypto-js": "^4.2.1",
+    "@types/uuid": "^9.0.7",
+    "typescript": "^5.2.2",
+    "vite": "^4.5.1"
+  },
+  "dependencies": {
+    "@types/chrome": "^0.0.254",
+    "crypto-js": "^4.2.0",
+    "uuid": "^9.0.1"
+  }
+}
