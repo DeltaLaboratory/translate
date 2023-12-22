@@ -1,5 +1,20 @@
 import {detectLang, translate, translateImage} from './papago'
 
+const retry = async <T>(fn: (...arg: any[]) => Promise<T>, argument: any[], maxRetries: number): Promise<T> => {
+    let retries = 0
+    while (true) {
+        try {
+            return await fn(...argument)
+        } catch (e) {
+            console.log(`retrying ${fn.name} with ${argument} due to ${e}`)
+            if (retries >= maxRetries) {
+                throw e
+            }
+            retries++
+        }
+    }
+}
+
 chrome.runtime.onMessage.addListener((request, _sender, sendResponse) => {
     if (request.action === 'detect_lang') {
         detectLang(request.text).then(lang => {
@@ -44,7 +59,7 @@ chrome.contextMenus.onClicked.addListener(async (info, tab) => {
                     },
                 }] as chrome.declarativeNetRequest.Rule[],
             });
-            let image = await translateImage(await (await fetch(imageURL.toString())).blob(), config.image_source_lang, 'ko')
+            let image = await retry(translateImage, [await (await fetch(imageURL.toString())).blob(), config.image_source_lang, 'ko'], 5)
             await chrome.tabs.sendMessage(tab!.id!, {
                 action: 'alter_image_url',
                 url: info.srcUrl,
@@ -58,8 +73,16 @@ chrome.contextMenus.onClicked.addListener(async (info, tab) => {
         }
     }
     if (info.menuItemId === 'translate') {
+        // we are using this because info.selectionText removes newlines.
+        // see https://bugs.chromium.org/p/chromium/issues/detail?id=116429
+        let selectedText = await chrome.scripting.executeScript({
+            target: {tabId: tab!.id!},
+            func: () => {
+                return window.getSelection()!.toString()
+            }
+        })
         try {
-            let json = await translate(info.selectionText!, 'auto', 'ko')
+            let json = await translate(selectedText[0].result, 'auto', 'ko')
             await chrome.tabs.sendMessage(tab!.id!, {
                 action: 'translated_overlay',
                 translated: json
