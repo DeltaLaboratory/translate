@@ -19,7 +19,7 @@
     "128": "resource/icon.png"
   },
   "permissions": ["storage", "declarativeNetRequest", "contextMenus"],
-  "host_permissions": ["*://*.youtube.com/*", "*://*.naver.com/*", "*://*/*"],
+  "host_permissions": ["*://*/*"],
   "content_scripts": [
     {
       "matches": ["*://*.youtube.com/*"],
@@ -29,7 +29,7 @@
     {
       "matches": ["http://*/*", "https://*/*"],
       "run_at": "document_end",
-      "js": ["src/ctx_image.ts"]
+      "js": ["src/page_helper.ts"]
     }
   ],
   "background": {

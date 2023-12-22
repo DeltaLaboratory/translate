@@ -27,8 +27,13 @@
   </head>
   <body>
     <div id="app">
-      <h3>Comment Translator Config</h3>
-      <!-- honorific switch -->
+      <h3>Translator Config</h3>
+        <div class="align-items">
+            <label for="engine">Translate Engine</label>
+            <select id="engine">
+                <option value="papago">Papago</option>
+            </select>
+        </div>
         <div class="align-items">
             <label for="honorific">Honorific</label>
             <input type="checkbox" id="honorific"/>
@@ -43,6 +48,6 @@
             </select>
         </div>
     </div>
-    <script src="src/config.ts"></script>
+    <script src="src/config.ts" type="module"></script>
   </body>
 </html>

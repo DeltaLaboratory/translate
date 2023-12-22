@@ -1,86 +1,84 @@
 const QS_TRANSLATE_BUTTON = "#header>#header-author>yt-formatted-string>#translate-button";
 const QS_CONTENT_TEXT = "#expander>#content>#content-text";
 const QS_BUTTON_CONTAINER = "#header>#header-author>yt-formatted-string";
-
 const QS_DESCRIPTION_CONTAINER = "#info-container";
 const QS_DESCRIPTION_EXPANDED = "#description-inline-expander > yt-attributed-string";
+const TRANSLATE_TEXT = "translate";
+const UNDO_TEXT = "undo";
+const TARGET = navigator.language || navigator.userLanguage;
 
-
-const TRANSLATE_TEXT = "translate", UNDO_TEXT = "undo", TARGET = navigator.language || navigator.userLanguage;
-
-function ReplaceNode(a, b) {
+const replaceNode = (a, b) => {
     a.parentNode.appendChild(b);
     a.parentNode.removeChild(a);
-}
+};
 
-function TranslateButton_Translate() {
-    this.onclick = TranslateButton_SetState;
-    chrome.runtime.sendMessage({"action": "detect_lang", "text": this._otext.innerText}).then(lang => {
-        this.detected_lang = lang;
-        chrome.runtime.sendMessage({"action": "translate", "source": lang, "target": TARGET, "text": this._otext.innerText}).then(result => {
-            this._ntext.innerText = result.translatedText;
-        })
-    })
-}
-
-
-function TranslateButton_SetState() {
+const translateButtonSetState = function () {
     if (this._ntext.parentNode !== null) {
-        ReplaceNode(this._ntext, this._otext);
+        replaceNode(this._ntext, this._otext);
         this.innerText = TRANSLATE_TEXT;
     } else {
-        ReplaceNode(this._otext, this._ntext);
+        replaceNode(this._otext, this._ntext);
         this.innerText = `${UNDO_TEXT} (${this.detected_lang})`;
     }
-}
+};
 
-const ResetTranslateButton = (translate_button) => {
-    if (translate_button._ntext.parentNode !== null) ReplaceNode(translate_button._ntext, translate_button._otext);
+const resetTranslateButton = (translateButton) => {
+    if (translateButton._ntext.parentNode !== null) replaceNode(translateButton._ntext, translateButton._otext);
 
-    translate_button._ntext.innerText = "";
-    translate_button.innerText = TRANSLATE_TEXT;
-    translate_button.onclick = TranslateButton_Translate;
-}
+    translateButton._ntext.innerText = "";
+    translateButton.innerText = TRANSLATE_TEXT;
+    translateButton.onclick = translateButtonTranslate;
+};
 
-const TranslateButton = (comment)  => {
-    const translate_button = document.createElement("a");
-    translate_button.id = "translate-button";
-    translate_button.style = "margin-left: 5px";
-    translate_button.classList = "yt-simple-endpoint style-scope yt-formatted-string";
+const translateButtonTranslate = async () => {
+    this.onclick = translateButtonSetState;
+    chrome.runtime.sendMessage({ "action": "detect_lang", "text": this._otext.innerText }).then(lang => {
+        this.detected_lang = lang;
+        chrome.runtime.sendMessage({ "action": "translate", "source": lang, "target": TARGET, "text": this._otext.innerText }).then(result => {
+            this._ntext.innerText = result.translatedText;
+        });
+    });
+};
 
-    translate_button._otext = comment.querySelector(QS_CONTENT_TEXT);
-    translate_button._otext.addEventListener("DOMSubtreeModified", _ => ResetTranslateButton(translate_button));
+const createTranslateButton = (comment) => {
+    const translateButton = document.createElement("a");
+    translateButton.style = "margin-left: 5px";
+    translateButton.classList = "yt-simple-endpoint style-scope yt-formatted-string";
+    translateButton.onclick = translateButtonTranslate;
 
-    translate_button._ntext = document.createElement("div");
-    translate_button._ntext.style.whiteSpace = "pre-wrap";
-    translate_button._ntext.id = "content-text";
-    translate_button._ntext.classList = "style-scope ytd-comment-renderer translate-text yt-formatted-string";
+    translateButton._otext = comment.querySelector(QS_CONTENT_TEXT);
+    translateButton._otext.addEventListener("DOMSubtreeModified", () => resetTranslateButton(translateButton));
 
-    ResetTranslateButton(translate_button);
-    return translate_button;
-}
+    translateButton._ntext = document.createElement("div");
+    translateButton._ntext.style.whiteSpace = "pre-wrap";
+    translateButton._ntext.id = "content-text";
+    translateButton._ntext.classList = "style-scope ytd-comment-renderer translate-text yt-formatted-string";
 
-const CommentObserver = new MutationObserver(e => {
-    for (let mut of e) {
-        if (mut.target.id === "contents") {
-            for (let n of mut.addedNodes) {
-                let main = n.querySelector("#body>#main");
+    resetTranslateButton(translateButton);
+    return translateButton;
+};
+
+const commentObserverCallback = (mutations) => {
+    for (let mutation of mutations) {
+        if (mutation.target.id === "contents") {
+            for (let node of mutation.addedNodes) {
+                let main = node.querySelector("#body>#main");
                 if (!main) continue;
 
-                let tb = main.querySelector(QS_TRANSLATE_BUTTON);
-                if (tb != null) {
-                    ResetTranslateButton(tb);
+                let translateButton = main.querySelector(QS_TRANSLATE_BUTTON);
+                if (translateButton !== null) {
+                    resetTranslateButton(translateButton);
                 } else {
-                    main.querySelector(QS_BUTTON_CONTAINER).appendChild(TranslateButton(main));
+                    main.querySelector(QS_BUTTON_CONTAINER).appendChild(createTranslateButton(main));
                 }
             }
         }
     }
-});
+};
 
-const init = () => {
-    const observerConfig = {childList: true, subtree: true};
-    CommentObserver.observe(document, observerConfig);
-}
+const commentObserver = new MutationObserver(commentObserverCallback);
 
-init();
+(() => {
+    const observerConfig = { childList: true, subtree: true };
+    commentObserver.observe(document, observerConfig);
+})()

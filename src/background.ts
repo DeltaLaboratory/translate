@@ -1,74 +1,4 @@
-import hmacMD5 from 'crypto-js/hmac-md5'
-import hmacSHA1 from 'crypto-js/hmac-sha1'
-import Base64 from 'crypto-js/enc-base64';
-
-import { v4 } from 'uuid'
-
-const papagoVersion = 'v1.7.9_ee61e6111a'
-const deviceID = v4()
-
-const padAppHash = async (url: string) => {
-    const timeStampMilli = Date.now()
-    const pad = Base64.stringify(hmacSHA1(`${url}${timeStampMilli}`, 'aVwDprJBYvnz1NBs8W7GBuaHQDeoynolGF5IdsxyYP6lyCzxAOG38hleJo43NnB6'))
-    return `${url}?msgpad=${timeStampMilli}&md=${pad}`
-}
-
-const detectLang = async (text: string) => {
-    let time = Date.now()
-    let hash = Base64.stringify(hmacMD5(`${deviceID}\nhttps://papago.naver.com/apis/langs/dect\n${time}`, papagoVersion))
-    const res = await fetch(`https://papago.naver.com/apis/langs/dect`, {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/x-www-form-urlencoded',
-            'Authorization': `PPG ${deviceID}:${hash}`,
-            'device-type': 'pc',
-            'deviceId': deviceID,
-            'timestamp': `${time}`
-        },
-        body: `query=${encodeURIComponent(text)}`
-    })
-    const json = await res.json()
-    return json.langCode
-}
-
-const translate = async (text: string, source: string, target: string) => {
-    let time = Date.now()
-    let hash = Base64.stringify(hmacMD5(`${deviceID}\nhttps://papago.naver.com/apis/n2mt/translate\n${time}`, papagoVersion))
-
-    const config = await chrome.storage.sync.get(['honorific'])
-    console.log(config)
-
-    const res = await fetch(`https://papago.naver.com/apis/n2mt/translate`, {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/x-www-form-urlencoded',
-            'Authorization': `PPG ${deviceID}:${hash}`,
-            'device-type': 'pc',
-            'deviceId': deviceID,
-            'timestamp': `${time}`
-        },
-        body: `deviceId=${deviceID}&locale=${source}&agree=false&dict=false&dictDisplay=30&honorific=${config.honorific}&instant=true&paging=false&source=${source}&target=${target}&text=${text}`
-    })
-    return await res.json()
-}
-
-const translateImage = async (blob: Blob, source: string, target: string) => {
-    const formData = new FormData()
-    formData.append('image', blob, 'image')
-    formData.append('source', source)
-    formData.append('target', target)
-
-    let res = await fetch(await padAppHash('https://apis.naver.com/papago/papago_app/ocr/detect'), {
-        method: 'POST',
-        body: formData
-    })
-
-    const json = await res.json()
-    if (res.status >= 400) {
-        throw new Error(`Failed to translate image: ${json.errorCode}/${json.errorMessage}`)
-    }
-    return `data:image/png;base64,${json.renderedImage}`
-}
+import {detectLang, translate, translateImage} from './papago'
 
 chrome.runtime.onMessage.addListener((request, _sender, sendResponse) => {
     if (request.action === 'detect_lang') {
@@ -114,11 +44,7 @@ chrome.contextMenus.onClicked.addListener(async (info, tab) => {
                     },
                 }] as chrome.declarativeNetRequest.Rule[],
             });
-
-            console.log(chrome.declarativeNetRequest.getDynamicRules())
-            let res = await fetch(imageURL.toString())
-            let blob = await res.blob()
-            let image = await translateImage(blob, config.image_source_lang, 'ko')
+            let image = await translateImage(await (await fetch(imageURL.toString())).blob(), config.image_source_lang, 'ko')
             await chrome.tabs.sendMessage(tab!.id!, {
                 action: 'alter_image_url',
                 url: info.srcUrl,
@@ -131,17 +57,27 @@ chrome.contextMenus.onClicked.addListener(async (info, tab) => {
             })
         }
     }
+    if (info.menuItemId === 'translate') {
+        try {
+            let json = await translate(info.selectionText!, 'auto', 'ko')
+            await chrome.tabs.sendMessage(tab!.id!, {
+                action: 'translated_overlay',
+                translated: json
+            })
+        } catch (e) {
+            await chrome.tabs.sendMessage(tab!.id!, {
+                action: 'error_alert',
+                message: `Failed to translate: ${e}`
+            })
+        }
+    }
 })
 
 chrome.runtime.onInstalled.addListener(async () => {
-    chrome.storage.sync.get(['honorific', 'image_source_lang']).then((config) => {
-        if (config.honorific === undefined) {
-            chrome.storage.sync.set({honorific: true});
-        }
-
-        if (config.image_source_lang === undefined) {
-            chrome.storage.sync.set({image_source: 'en'});
-        }
+    await chrome.storage.local.set({
+        "honorific": false,
+        "target_lang": navigator.language,
+        "image_source_lang": 'en',
     })
 
     const rules = [{
