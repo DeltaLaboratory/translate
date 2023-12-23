@@ -1,6 +1,7 @@
 on:
-  tag:
-    - v*
+  push:
+    tags:
+      - 'v*'
 
 jobs:
   publish:
