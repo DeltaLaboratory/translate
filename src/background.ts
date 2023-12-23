@@ -1,19 +1,5 @@
 import {detectLang, translate, translateImage} from './papago'
-
-const retry = async <PT extends unknown[], T>(fn: (...arg: PT) => Promise<T>, maxRetries: number, argument: PT): Promise<T> => {
-    let retries = 0
-    while (true) {
-        try {
-            return await fn(...argument)
-        } catch (e) {
-            console.log(`retrying ${fn.name} with ${argument} due to ${e}`)
-            if (retries >= maxRetries) {
-                throw e
-            }
-            retries++
-        }
-    }
-}
+import {retry} from './utils'
 
 chrome.runtime.onMessage.addListener((request, _sender, sendResponse) => {
     switch (request.action) {
@@ -33,8 +19,9 @@ chrome.runtime.onMessage.addListener((request, _sender, sendResponse) => {
 })
 
 chrome.contextMenus.onClicked.addListener(async (info, tab) => {
+    let config = await chrome.storage.local.get(['image_source_lang', 'target_lang'])
+
     if (info.menuItemId === 'translate_image') {
-        let config = await chrome.storage.local.get(['image_source_lang'])
         try {
             let imageURL = new URL(info.srcUrl!)
             let url = new URL(tab!.url!)
@@ -60,7 +47,7 @@ chrome.contextMenus.onClicked.addListener(async (info, tab) => {
                     },
                 }] as chrome.declarativeNetRequest.Rule[],
             });
-            let image = await retry(translateImage, 5, [await (await fetch(imageURL.toString())).blob(), config.image_source_lang, 'ko'])
+            let image = await retry(translateImage, 5, [await (await fetch(imageURL.toString())).blob(), config.image_source_lang, config.target_lang])
             await chrome.tabs.sendMessage(tab!.id!, {
                 action: 'alter_image_url',
                 url: info.srcUrl,
@@ -74,6 +61,8 @@ chrome.contextMenus.onClicked.addListener(async (info, tab) => {
         }
     }
     if (info.menuItemId === 'translate') {
+        let translateText: string
+
         // we are using this because info.selectionText removes newlines.
         // see https://bugs.chromium.org/p/chromium/issues/detail?id=116429
         let selectedText = await chrome.scripting.executeScript({
@@ -82,8 +71,13 @@ chrome.contextMenus.onClicked.addListener(async (info, tab) => {
                 return window.getSelection()!.toString()
             }
         })
+        if (selectedText[0].result) {
+            translateText = selectedText[0].result
+        } else {
+            translateText = info.selectionText!
+        }
         try {
-            let json = await translate(selectedText[0].result, 'auto', 'ko')
+            let json = await translate(translateText, 'auto', config.target_lang)
             await chrome.tabs.sendMessage(tab!.id!, {
                 action: 'translated_overlay',
                 translated: json

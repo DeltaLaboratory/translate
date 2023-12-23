@@ -1,65 +1,104 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
-  <head>
+<head>
     <meta charset="UTF-8" />
     <title>Comment Translator Config</title>
     <style>
-      @font-face {
-        font-family: 'Pretendard-Regular';
-        src: url('https://cdn.jsdelivr.net/gh/Project-Noonnu/noonfonts_2107@1.1/Pretendard-Regular.woff') format('woff');
-        font-weight: 400;
-        font-style: normal;
-      }
+        body {
+            min-width: 350px;
+            min-height: 200px;
+            font-family: 'Pretendard-Regular', sans-serif;
+            margin: 0; /* Remove default margin */
+        }
 
-      body {
-        min-width:250px;
-        min-height:200px;
+        #app {
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: stretch;
+            height: 100vh;
+            box-sizing: border-box;
+        }
 
-        font-family: 'Pretendard-Regular', sans-serif;
-      }
+        label {
+            margin-bottom: 5px;
+        }
 
-      .align-items {
-        display: flex;
-        align-items: center;
-        gap: 10px;
-      }
+        .config-item {
+            display: flex;
+            flex-direction: row;
+            align-items: center;
+            margin-bottom: 10px;
+        }
 
-      .footer {
-          position: fixed;
-          left: 0;
-          bottom: 0;
-          width: 100%;
-          text-align: center;
-      }
+        .config-item select, .config-item input {
+            margin-left: 10px;
+        }
+
+        .footer {
+            margin-top: auto;
+            margin-bottom: 10px;
+            padding: 10px;
+            background-color: #f1f1f1;
+            display: flex;
+            justify-content: space-between;
+        }
+
+        @media (prefers-color-scheme: dark) {
+            body {
+                background-color: #1e1e1e;
+                color: #f1f1f1;
+            }
+
+            .footer {
+                background-color: #2e2e2e;
+            }
+        }
     </style>
-  </head>
-  <body>
-    <div id="app">
-      <h3>Translator Config</h3>
-        <div class="align-items">
-            <label for="engine">Translate Engine</label>
-            <select id="engine">
-                <option value="papago">Papago</option>
-            </select>
-        </div>
-        <div class="align-items">
-            <label for="honorific">Honorific</label>
-            <input type="checkbox" id="honorific"/>
-        </div>
-        <div class="align-items">
-            <label for="image_source_lang">Image Source Language</label>
-            <select id="image_source_lang">
-                <option value="ko">Korean</option>
-                <option value="en">English</option>
-                <option value="ja">Japanese</option>
-                <option value="zh">Chinese</option>
-            </select>
-        </div>
-        <div class="align-items footer" style="flex-direction: column">
-            <span id="translated_texts"></span>
-            <span id="translated_images"></span>
-        </div>
+</head>
+<body>
+<div id="app">
+    <div class="config-item">
+        <label for="engine">Translate Engine</label>
+        <select id="engine">
+            <option value="papago">Papago</option>
+        </select>
     </div>
-    <script src="src/config.ts" type="module"></script>
-  </body>
+
+    <div class="config-item">
+        <label for="honorific">Honorific</label>
+        <input type="checkbox" id="honorific" />
+    </div>
+
+    <div class="config-item">
+        <label for="image_source_lang">Image Source Language</label>
+        <select id="image_source_lang">
+            <option value="ko">Korean</option>
+            <option value="en">English</option>
+            <option value="ja">Japanese</option>
+            <option value="zh-CH">Chinese (Simplified)</option>
+            <option value="zh-TW">Chinese (Traditional)</option>
+            <option value="de">German</option>
+        </select>
+    </div>
+
+    <div class="config-item">
+        <label for="target_lang">Target Language</label>
+        <select id="target_lang">
+            <option value="ko">Korean</option>
+            <option value="en">English</option>
+            <option value="ja">Japanese</option>
+            <option value="zh-CH">Chinese (Simplified)</option>
+            <option value="zh-TW">Chinese (Traditional)</option>
+            <option value="de">German</option>
+        </select>
+    </div>
+
+    <div class="footer">
+        <span id="translated_status"></span>
+    </div>
+</div>
+
+<script src="src/config.ts" type="module"></script>
+</body>
 </html>
