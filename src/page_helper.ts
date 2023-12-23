@@ -1,5 +1,7 @@
 import {Translated} from "./models/papago";
 
+import './styles/overlay.css'
+
 let lastContextPosition: { x: number, y: number } = { x: 0, y: 0 }
 
 document.addEventListener("contextmenu", function(event){
@@ -9,21 +11,10 @@ document.addEventListener("contextmenu", function(event){
 
 const createTranslatedOverlay = (translated: Translated) => {
     const overlay = document.createElement('div')
-    overlay.style.position = 'absolute'
     overlay.style.top = `${window.scrollY + lastContextPosition.y}px`
     overlay.style.left = `${window.scrollX + lastContextPosition.x}px`
-    overlay.style.zIndex = '9999'
-    overlay.style.color = 'black'
-    overlay.style.backgroundColor = 'white'
-    overlay.style.border = '1px solid black'
-    overlay.style.padding = '10px'
-    overlay.style.borderRadius = '8px'
-    overlay.style.maxWidth = '500px'
-    overlay.style.maxHeight = '500px'
-    overlay.style.overflow = 'auto'
-    overlay.style.cursor = 'pointer'
-    overlay.style.fontSize = '12px'
-    overlay.style.fontFamily = `'Pretendard-Regular', 'Noto Sans KR', sans-serif`
+
+    overlay.className = 'translate-overlay'
 
     // drag
     let isDragging = false
@@ -50,7 +41,7 @@ const createTranslatedOverlay = (translated: Translated) => {
 
     const header = document.createElement('span')
     header.style.fontWeight = 'bold'
-    header.innerText = `Translated Text - ${translated.srcLangType} => ${translated.tarLangType}`
+    header.innerText = `Translated Text - ${translated.srcLangType} -> ${translated.tarLangType}`
     overlay.appendChild(header)
 
     overlay.appendChild(document.createElement('hr'))

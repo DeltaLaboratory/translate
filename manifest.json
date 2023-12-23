@@ -6,17 +6,17 @@
   "action": {
     "default_popup": "index.html",
     "default_icon": {
-      "16": "resource/icon.png",
-      "24": "resource/icon.png",
-      "32": "resource/icon.png"
+      "16": "icon.png",
+      "24": "icon.png",
+      "32": "icon.png"
     }
   },
   "icons": {
-    "16": "resource/icon.png",
-    "24": "resource/icon.png",
-    "32": "resource/icon.png",
-    "48": "resource/icon.png",
-    "128": "resource/icon.png"
+    "16": "icon.png",
+    "24": "icon.png",
+    "32": "icon.png",
+    "48": "icon.png",
+    "128": "icon.png"
   },
   "permissions": ["storage", "declarativeNetRequest", "contextMenus", "scripting"],
   "host_permissions": ["*://*/*"],
