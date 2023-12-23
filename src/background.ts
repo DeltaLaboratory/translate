@@ -34,7 +34,7 @@ chrome.runtime.onMessage.addListener((request, _sender, sendResponse) => {
 
 chrome.contextMenus.onClicked.addListener(async (info, tab) => {
     if (info.menuItemId === 'translate_image') {
-        let config = await chrome.storage.sync.get(['image_source_lang'])
+        let config = await chrome.storage.local.get(['image_source_lang'])
         try {
             let imageURL = new URL(info.srcUrl!)
             let url = new URL(tab!.url!)
@@ -102,6 +102,8 @@ chrome.runtime.onInstalled.addListener(async () => {
         "honorific": false,
         "target_lang": navigator.language,
         "image_source_lang": 'en',
+        "translated_text_count": 0,
+        "translated_image_count": 0
     })
 
     const rules = [{

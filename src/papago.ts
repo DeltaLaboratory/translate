@@ -41,6 +41,15 @@ export const detectLang = async (text: string) => {
 }
 
 export const translate = async (text: string, source: string, target: string) => {
+    chrome.storage.local.get(['translated_text_count'], (res) => {
+        if (!res.translated_text_count) {
+            res.translated_text_count = 0
+        }
+        chrome.storage.local.set({
+            translated_text_count: res.translated_text_count + 1
+        })
+    })
+
     const config = await chrome.storage.local.get(['honorific'])
     const res = await fetch(`https://papago.naver.com/apis/n2mt/translate`, {
         method: 'POST',
@@ -54,6 +63,15 @@ export const translate = async (text: string, source: string, target: string) =>
 }
 
 export const translateImage = async (blob: Blob, source: string, target: string) => {
+    chrome.storage.local.get(['translated_image_count'], (res) => {
+        if (!res.translated_image_count) {
+            res.translated_image_count = 0
+        }
+        chrome.storage.local.set({
+            translated_image_count: res.translated_image_count + 1
+        })
+    })
+
     const formData = new FormData()
     formData.append('image', blob, 'image')
     formData.append('source', source)
