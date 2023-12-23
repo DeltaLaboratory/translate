@@ -44,12 +44,12 @@ jobs:
       - name: Compress dist
         uses: montudor/action-zip@v1
         with:
-          args: zip -qq -r Translator-${{ github.ref }}.zip dist
+          args: zip -qq -r Translator-${{ github.ref_name }}.zip dist
 
       - name: Publish Release
         uses: softprops/action-gh-release@v1
         with:
-          files: Translator-${{ github.ref }}.zip
+          files: Translator-${{ github.ref_name }}.zip
           tag_name: ${{ github.ref }}
           draft: false
           prerelease: false
