@@ -49,8 +49,8 @@ jobs:
       - name: Publish Release
         uses: softprops/action-gh-release@v1
         with:
+          name: Translator ${{ github.ref_name }}
           files: Translator-${{ github.ref_name }}.zip
-          tag_name: ${{ github.ref }}
           draft: false
           prerelease: false
         env:
