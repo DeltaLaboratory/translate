@@ -53,7 +53,10 @@ const createTranslatedOverlay = (translated: Translated) => {
     header.innerText = `Translated Text - ${translated.srcLangType} => ${translated.tarLangType}`
     overlay.appendChild(header)
 
+    overlay.appendChild(document.createElement('hr'))
+
     const text = document.createElement('p')
+    text.style.marginBottom = '5px'
     text.innerText = translated.translatedText
     overlay.appendChild(text)
 
@@ -63,6 +66,18 @@ const createTranslatedOverlay = (translated: Translated) => {
         overlay.remove()
     })
     overlay.appendChild(closeButton)
+
+    const copyButton = document.createElement('button')
+    copyButton.style.marginLeft = '5px'
+    copyButton.innerText = 'Copy'
+    copyButton.addEventListener('click', async () => {
+        await navigator.clipboard.writeText(translated.translatedText)
+        copyButton.innerText = 'Copied!'
+        setTimeout(() => {
+            copyButton.innerText = 'Copy'
+        }, 1000)
+    })
+    overlay.appendChild(copyButton)
 
     return overlay
 }
