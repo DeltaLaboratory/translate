@@ -14,7 +14,6 @@ imageSourceSelect.addEventListener('change', async () => {
 })
 
 chrome.storage.local.get(['honorific', 'image_source_lang', 'translated_text_count', 'translated_image_count']).then((config) => {
-    console.log(config);
     honorificCheckbox.checked = config.honorific;
     imageSourceSelect.value = config.image_source_lang;
 
