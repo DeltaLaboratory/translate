@@ -4,7 +4,7 @@ import Base64 from 'crypto-js/enc-base64';
 
 import { v4 } from 'uuid'
 
-import {Translated} from "./models/papago";
+import {Translated, TranslationError} from "./models/papago";
 import {UnretryableError} from "./utils.ts";
 
 const version = 'v1.7.9_ee61e6111a'
@@ -88,12 +88,14 @@ export const translateImage = async (blob: Blob, source: string, target: string)
         body: formData
     })
 
-    const json = await res.json()
+    let json = await res.json()
     if (res.status >= 400) {
+        json = json as TranslationError
         if (json.errorCode === ERROR_CODES.NO_CHAR_DETECTED) {
             throw new UnretryableError(json.errorMessage)
         }
         throw new Error(`Failed to translate image: ${json.errorCode}/${json.errorMessage}`)
     }
+    json = json as Translated
     return `data:image/png;base64,${json.renderedImage}`
 }

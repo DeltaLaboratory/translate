@@ -14,7 +14,7 @@ export const retry = async <PT extends unknown[], T>(fn: (...arg: PT) => Promise
             if (e instanceof UnretryableError) {
                 throw e
             }
-            console.log(`retrying ${fn.name} with ${argument} due to ${e}`)
+            console.debug(`retrying ${fn.name} with ${argument} due to ${e}`)
             if (retries >= maxRetries) {
                 throw e
             }
@@ -32,14 +32,14 @@ export const resizeWithMaxSize = async (image: Blob, maxWidth: number, maxHeight
     if (width > height) {
         // log if image size exceeds max size
         if (width > maxWidth) {
-            console.log(`image width ${width} exceeds max width ${maxWidth}`)
+            console.debug(`image width ${width} exceeds max width ${maxWidth}`)
         }
         canvas.width = maxWidth
         canvas.height = height * (maxWidth / width)
     } else {
         // log if image size exceeds max size
         if (height > maxHeight) {
-            console.log(`image height ${height} exceeds max height ${maxHeight}`)
+            console.debug(`image height ${height} exceeds max height ${maxHeight}`)
         }
         canvas.height = maxHeight
         canvas.width = width * (maxHeight / height)
