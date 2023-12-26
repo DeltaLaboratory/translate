@@ -5,6 +5,18 @@
     font-style: normal;
 }
 
+.image-overlay-button {
+    position: absolute;
+    top: 0;
+    right: 0;
+    background-color: #4CAF50;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    cursor: pointer;
+    font-size: 16px;
+}
+
 .translate-overlay {
     position: absolute;
     background-color: rgba(0, 0, 0, 0.5);

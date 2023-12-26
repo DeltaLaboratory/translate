@@ -7,12 +7,10 @@
         @font-face {
             font-family: 'Pretendard-Regular';
             src: url('https://cdn.jsdelivr.net/gh/Project-Noonnu/noonfonts_2107@1.1/Pretendard-Regular.woff') format('woff');
-            font-weight: 400;
-            font-style: normal;
         }
 
         body {
-            min-width: 350px;
+            min-width: 400px;
             min-height: 200px;
             font-family: 'Pretendard-Regular', sans-serif;
             margin: 0;
@@ -31,7 +29,6 @@
         .footer {
             margin-top: auto;
             padding: 10px;
-            background-color: #f1f1f1;
             display: flex;
             justify-content: space-between;
         }
@@ -111,10 +108,6 @@
                 background-color: #1e1e1e;
                 color: #f1f1f1;
             }
-
-            .footer {
-                background-color: #2e2e2e;
-            }
         }
 
     </style>
@@ -155,6 +148,11 @@
             <option value="zh-TW">Chinese (Traditional)</option>
             <option value="de">German</option>
         </select>
+    </div>
+
+    <div class="config-item">
+        <label id="cache_status">Cache Size: (measuring)KiB</label>
+        <button id="cache_prune">Clear Cache</button>
     </div>
 
     <div class="footer">

@@ -1,20 +1,28 @@
 import {detectLang, translate, translateImage} from './papago'
 import {resizeWithMaxSize, retry} from './utils'
+import {imageCache} from "./cache.ts";
 
-chrome.runtime.onMessage.addListener((request, _sender, sendResponse) => {
-    switch (request.action) {
-        case 'detect_lang':
-            detectLang(request.text).then(lang => {
-                sendResponse(lang)
-            })
-            return true
-        case 'translate':
-            translate(request.text, request.source, request.target).then(json => {
-                sendResponse(json)
-            })
-            return true
-        default:
-            return false
+chrome.runtime.onMessage.addListener(async (request, _sender, sendResponse) => {
+    const listener: Record<string, (request: any, sender: chrome.runtime.MessageSender, sendResponse: (any)) => Promise<any>> = {
+        "image_cache_size": async (_request, _sender, _sendResponse) => {
+            await imageCache.openWithPrune()
+            return await imageCache.size()
+        },
+        "image_cache_prune": async (_request, _sender, _sendResponse) => {
+            await imageCache.openWithPrune()
+            await imageCache.prune(true)
+            return
+        },
+        "translate": async (_request, _sender, _sendResponse) => {
+            return await translate(request.text, request.source, request.target)
+        },
+        "detect_lang": async (_request, _sender, _sendResponse) => {
+            return await detectLang(request.text)
+        }
+    }
+    console.debug(`Received message: ${request.action}`)
+    if (listener[request.action as string]) {
+        sendResponse(await listener[request.action as string](request, _sender, sendResponse))
     }
 })
 
@@ -22,6 +30,16 @@ chrome.contextMenus.onClicked.addListener(async (info, tab) => {
     let config = await chrome.storage.local.get(['image_source_lang', 'target_lang'])
 
     if (info.menuItemId === 'translate_image') {
+        await imageCache.openWithPrune()
+        if (await imageCache.has(info.srcUrl!)) {
+            let blob = await imageCache.get(info.srcUrl!)
+            await chrome.tabs.sendMessage(tab!.id!, {
+                action: 'alter_image_url',
+                url: info.srcUrl,
+                translated_url: await new Response(blob!).text()
+            })
+            return
+        }
         try {
             let imageURL = new URL(info.srcUrl!)
             let url = new URL(tab!.url!)
@@ -49,6 +67,7 @@ chrome.contextMenus.onClicked.addListener(async (info, tab) => {
             });
             let sourceImage = await (await fetch(imageURL.toString())).blob()
             let image = await retry(translateImage, 5, [await resizeWithMaxSize(sourceImage, 1960, 1960), config.image_source_lang, config.target_lang])
+            await imageCache.set(info.srcUrl!, new Blob([image]))
             await chrome.tabs.sendMessage(tab!.id!, {
                 action: 'alter_image_url',
                 url: info.srcUrl,

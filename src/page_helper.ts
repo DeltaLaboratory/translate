@@ -77,18 +77,36 @@ chrome.runtime.onMessage.addListener(async (request, _sender, sendResponse) => {
     if (request.action === 'alter_image_url') {
         let found = false
         document.querySelectorAll('img').forEach((img) => {
-            console.log(img.src, request.url)
             if (img.src === request.url) {
                 found = true
                 img.src = request.translated_url
                 img.srcset = ''
+
+                const button = document.createElement('button')
+                button.innerText = 'Revert'
+                button.className = 'image-overlay-button'
+                button.addEventListener('click', () => {
+                    img.src = request.url
+                    button.remove()
+                })
+                img.parentElement!.insertBefore(button, img)
             }
         })
         document.querySelectorAll('source').forEach((source) => {
-            console.log(source.srcset, request.url)
             if (source.srcset === request.url) {
                 found = true
                 source.srcset = request.translated_url
+
+                let parent = source.parentElement!
+
+                let button = document.createElement('button')
+                button.innerText = 'Revert'
+                button.className = 'image-overlay-button'
+                button.addEventListener('click', () => {
+                    source.srcset = request.url
+                    button.remove()
+                })
+                parent.appendChild(button)
             }
         })
         sendResponse(found)

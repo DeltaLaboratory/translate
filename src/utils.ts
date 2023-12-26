@@ -47,3 +47,26 @@ export const resizeWithMaxSize = async (image: Blob, maxWidth: number, maxHeight
     ctx.drawImage(img, 0, 0, canvas.width, canvas.height)
     return await canvas.convertToBlob()
 }
+
+export const stripCommonDupe = (url: string) => {
+    // check if url ends with an extension, if so, remove key and expires from query string
+    const urlObj = new URL(url)
+    const ext = urlObj.pathname.split('.').pop()
+    if (ext) {
+        urlObj.searchParams.delete('key')
+        urlObj.searchParams.delete('expires')
+        return urlObj.toString()
+    }
+
+    return urlObj.toString()
+}
+
+export const formatByteLength = (bytes: number) => {
+    const units = ['B', 'KiB', 'MiB', 'GiB', 'TiB', 'PiB']
+    let unit = 0
+    while (bytes > 1024) {
+        bytes /= 1024
+        unit++
+    }
+    return `${bytes.toFixed(2)} ${units[unit]}`
+}
