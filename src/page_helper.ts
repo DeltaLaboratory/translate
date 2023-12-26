@@ -80,6 +80,7 @@ chrome.runtime.onMessage.addListener(async (request, _sender, sendResponse) => {
             if (img.src === request.url) {
                 found = true
                 img.src = request.translated_url
+                img.srcset = ''
             }
         })
         sendResponse(found)

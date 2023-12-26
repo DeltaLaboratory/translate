@@ -1,5 +1,5 @@
 import {detectLang, translate, translateImage} from './papago'
-import {retry} from './utils'
+import {resizeWithMaxSize, retry} from './utils'
 
 chrome.runtime.onMessage.addListener((request, _sender, sendResponse) => {
     switch (request.action) {
@@ -47,7 +47,8 @@ chrome.contextMenus.onClicked.addListener(async (info, tab) => {
                     },
                 }] as chrome.declarativeNetRequest.Rule[],
             });
-            let image = await retry(translateImage, 5, [await (await fetch(imageURL.toString())).blob(), config.image_source_lang, config.target_lang])
+            let sourceImage = await (await fetch(imageURL.toString())).blob()
+            let image = await retry(translateImage, 5, [await resizeWithMaxSize(sourceImage, 1960, 1960), config.image_source_lang, config.target_lang])
             await chrome.tabs.sendMessage(tab!.id!, {
                 action: 'alter_image_url',
                 url: info.srcUrl,

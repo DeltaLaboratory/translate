@@ -5,9 +5,15 @@ import Base64 from 'crypto-js/enc-base64';
 import { v4 } from 'uuid'
 
 import {Translated} from "./models/papago";
+import {UnretryableError} from "./utils.ts";
 
 const version = 'v1.7.9_ee61e6111a'
 const deviceID = v4()
+
+export const ERROR_CODES = {
+    "HMAC_ERROR": "024",
+    "NO_CHAR_DETECTED": "OCR12",
+}
 
 const padAppHash = async (url: string) => {
     const timeStampMilli = Date.now()
@@ -84,6 +90,9 @@ export const translateImage = async (blob: Blob, source: string, target: string)
 
     const json = await res.json()
     if (res.status >= 400) {
+        if (json.errorCode === ERROR_CODES.NO_CHAR_DETECTED) {
+            throw new UnretryableError(json.errorMessage)
+        }
         throw new Error(`Failed to translate image: ${json.errorCode}/${json.errorMessage}`)
     }
     return `data:image/png;base64,${json.renderedImage}`
