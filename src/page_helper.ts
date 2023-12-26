@@ -77,10 +77,18 @@ chrome.runtime.onMessage.addListener(async (request, _sender, sendResponse) => {
     if (request.action === 'alter_image_url') {
         let found = false
         document.querySelectorAll('img').forEach((img) => {
+            console.log(img.src, request.url)
             if (img.src === request.url) {
                 found = true
                 img.src = request.translated_url
                 img.srcset = ''
+            }
+        })
+        document.querySelectorAll('source').forEach((source) => {
+            console.log(source.srcset, request.url)
+            if (source.srcset === request.url) {
+                found = true
+                source.srcset = request.translated_url
             }
         })
         sendResponse(found)
