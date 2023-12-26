@@ -38,13 +38,19 @@ jobs:
       - name: Install dependencies
         run: pnpm install
 
-      - name: Build
-        run: pnpm run build
-
       - name: modify manifest.json & package.json version
         run: |
-          echo "`jq '.version="${{ github.ref_name }}"' manifest.json`" > manifest.json
-          echo "`jq '.version="${{ github.ref_name }}"' package.json`" > package.json
+          # Remove 'v' from github.ref_name and store it in a variable
+          version=$(echo "${{ github.ref_name }}" | sed 's/^v//')
+
+          # Update manifest.json version
+          echo "$(jq --arg version "$version" '.version=$version' manifest.json)" > manifest.json
+
+          # Update package.json version
+          echo "$(jq --arg version "$version" '.version=$version' package.json)" > package.json
+
+      - name: Build
+        run: pnpm run build
 
       - name: Compress dist
         uses: montudor/action-zip@v1
