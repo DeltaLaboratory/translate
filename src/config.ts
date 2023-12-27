@@ -1,5 +1,5 @@
-import {formatByteLength} from "./utils.ts";
-import {imageCache} from "./cache.ts";
+import {formatByteLength} from "./utils/utils";
+import {imageCache} from "./utils/cache";
 
 const honorificCheckbox = document.getElementById('honorific') as HTMLInputElement;
 const imageSourceSelect = document.getElementById('image_source_lang') as HTMLSelectElement;

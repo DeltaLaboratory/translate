@@ -32,15 +32,15 @@ export interface ImageTranslated {
 }
 
 export interface Ocr {
-    LB:   LB;
-    LT:   LB;
-    RB:   LB;
-    RT:   LB;
+    LB:   Coordinate;
+    LT:   Coordinate;
+    RB:   Coordinate;
+    RT:   Coordinate;
     text: string;
     lang: string;
 }
 
-export interface LB {
+export interface Coordinate {
     x: number;
     y: number;
 }

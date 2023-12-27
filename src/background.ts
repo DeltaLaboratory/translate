@@ -1,6 +1,6 @@
 import {detectLang, translate, translateImage} from './papago'
-import {resizeWithMaxSize, retry} from './utils'
-import {imageCache} from "./cache.ts";
+import {resizeWithMaxSize, retry} from './utils/utils'
+import {imageCache} from "./utils/cache";
 
 chrome.runtime.onMessage.addListener(async (request, _sender, sendResponse) => {
     const listener: Record<string, (request: any, sender: chrome.runtime.MessageSender, sendResponse: (any)) => Promise<any>> = {
@@ -20,7 +20,6 @@ chrome.runtime.onMessage.addListener(async (request, _sender, sendResponse) => {
             return await detectLang(request.text)
         }
     }
-    console.debug(`Received message: ${request.action}`)
     if (listener[request.action as string]) {
         sendResponse(await listener[request.action as string](request, _sender, sendResponse))
     }

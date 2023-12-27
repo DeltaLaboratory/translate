@@ -24,7 +24,7 @@
     {
       "matches": ["*://*.youtube.com/*"],
       "run_at": "document_end",
-      "js": ["src/youtube.js"]
+      "js": ["src/sites/youtube.js"]
     },
     {
       "matches": ["http://*/*", "https://*/*"],
