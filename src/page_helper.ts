@@ -1,4 +1,5 @@
 import {Translated} from "./models/papago";
+import {normalizeUrl} from "./utils/utils";
 
 import './styles/overlay.css'
 
@@ -76,39 +77,60 @@ const createTranslatedOverlay = (translated: Translated) => {
 chrome.runtime.onMessage.addListener(async (request, _sender, sendResponse) => {
     if (request.action === 'alter_image_url') {
         let found = false
-        document.querySelectorAll('img').forEach((img) => {
-            if (img.src === request.url) {
+        let parentElement: HTMLImageElement | HTMLPictureElement;
+        let controlElement: HTMLImageElement | HTMLSourceElement;
+        // find img element OR picture element with an img element as child, check for source tag
+        for (const img of document.querySelectorAll('img, picture')) {
+            if (normalizeUrl(img.getAttribute('src')!) === request.url) {
+                parentElement = img as HTMLImageElement
+                controlElement = img as HTMLImageElement
+                img.setAttribute('data-original-src', img.getAttribute('src')!)
+                if (img.getAttribute('srcset')) {
+                    img.setAttribute('data-original-srcset', img.getAttribute('srcset')!)
+                }
+
+                img.setAttribute('src', request.translated_url)
+                if (img.getAttribute('srcset')) {
+                    img.setAttribute('srcset', request.translated_url)
+                }
                 found = true
-                img.src = request.translated_url
-                img.srcset = ''
-
-                const button = document.createElement('button')
-                button.innerText = 'Revert'
-                button.className = 'image-overlay-button'
-                button.addEventListener('click', () => {
-                    img.src = request.url
-                    button.remove()
-                })
-                img.parentElement!.insertBefore(button, img)
             }
-        })
-        document.querySelectorAll('source').forEach((source) => {
-            if (source.srcset === request.url) {
-                found = true
-                source.srcset = request.translated_url
-
-                let parent = source.parentElement!
-
-                let button = document.createElement('button')
-                button.innerText = 'Revert'
-                button.className = 'image-overlay-button'
-                button.addEventListener('click', () => {
-                    source.srcset = request.url
-                    button.remove()
-                })
-                parent.appendChild(button)
+            if (img.querySelector('source')) {
+                for (let source of img.querySelectorAll('source')) {
+                    if (normalizeUrl(source.srcset) === request.url) {
+                        controlElement = source as HTMLSourceElement
+                        parentElement = img as HTMLPictureElement
+                        source.srcset = request.translated_url
+                        found = true
+                    }
+                }
             }
-        })
+        }
+
+        if (found) {
+            let originalButton = document.createElement('button')
+            originalButton.innerText = "U"
+            originalButton.title = "Show original image"
+            originalButton.addEventListener('click', async () => {
+                controlElement!.setAttribute('src', parentElement!.getAttribute('data-original-src')!)
+                if (controlElement!.getAttribute('data-original-srcset')) {
+                    controlElement!.setAttribute('srcset', parentElement!.getAttribute('data-original-srcset')!)
+                }
+                controlElement!.removeAttribute('data-original-src')
+                controlElement!.removeAttribute('data-original-srcset')
+                originalButton.remove()
+            })
+            addEventListener('resize', () => {
+                let rect = parentElement!.getBoundingClientRect()
+                originalButton.style.top = `${window.scrollY + rect.top + 10}px`
+                originalButton.style.left = `${window.scrollX + rect.left + 10}px`
+            })
+            let rect = parentElement!.getBoundingClientRect()
+            originalButton.style.top = `${window.scrollY + rect.top + 10}px`
+            originalButton.style.left = `${window.scrollX + rect.left + 10}px`
+            originalButton.className = 'image-original-button'
+            document.body.appendChild(originalButton)
+        }
         sendResponse(found)
         return true
     }

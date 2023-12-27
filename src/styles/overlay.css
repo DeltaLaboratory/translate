@@ -5,16 +5,23 @@
     font-style: normal;
 }
 
-.image-overlay-button {
+.image-original-button {
     position: absolute;
-    top: 0;
-    right: 0;
-    background-color: #4CAF50;
+    background-color: rgba(0, 0, 0, 0.3);
     color: white;
-    border: none;
-    padding: 10px 20px;
-    cursor: pointer;
-    font-size: 16px;
+    padding: 10px;
+    border-radius: 8px;
+    user-select: none;
+    border: 2px solid white;
+    font-size: 14px;
+    font-family: 'Pretendard-Regular', 'Noto Sans KR', sans-serif;
+    text-align: center;
+    display: inline-flex;
+    align-items: center;
+}
+
+.image-original-button:hover {
+    background-color: rgba(0, 0, 0, 0.6);
 }
 
 .translate-overlay {

@@ -70,3 +70,17 @@ export const formatByteLength = (bytes: number) => {
     }
     return `${bytes.toFixed(2)} ${units[unit]}`
 }
+
+export const normalizeUrl = (url: string) => {
+    // for //example.com like urls, add https: to the beginning
+    if (url.startsWith('//')) {
+        url = 'https:' + url
+    }
+    try {
+        const urlObj = new URL(url)
+        urlObj.hash = ''
+        return urlObj.toString()
+    } catch (e) {
+        return url
+    }
+}
