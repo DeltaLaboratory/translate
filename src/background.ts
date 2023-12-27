@@ -2,7 +2,7 @@ import {detectLang, translate, translateImage} from './papago'
 import {resizeWithMaxSize, retry} from './utils/utils'
 import {imageCache} from "./utils/cache";
 
-chrome.runtime.onMessage.addListener(async (request, _sender, sendResponse) => {
+chrome.runtime.onMessage.addListener((request, _sender, sendResponse) => {
     const listener: Record<string, (request: any, sender: chrome.runtime.MessageSender, sendResponse: (any)) => Promise<any>> = {
         "image_cache_size": async (_request, _sender, _sendResponse) => {
             await imageCache.openWithPrune()
@@ -21,8 +21,13 @@ chrome.runtime.onMessage.addListener(async (request, _sender, sendResponse) => {
         }
     }
     if (listener[request.action as string]) {
-        sendResponse(await listener[request.action as string](request, _sender, sendResponse))
+        listener[request.action as string](request, _sender, sendResponse).then((response) => {
+            console.debug(response)
+            sendResponse(response)
+        })
+        return true
     }
+    return false
 })
 
 chrome.contextMenus.onClicked.addListener(async (info, tab) => {
