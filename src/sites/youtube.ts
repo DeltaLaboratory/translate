@@ -74,8 +74,8 @@ const createTranslateButton = (main: HTMLElement) => {
     translateButtonText.className = 'translate-button-text more-button style-scope ytd-comment-renderer';
     translateButtonText.style.textDecoration = 'none';
     translateButtonText.style.cursor = 'pointer'
-
     translateButton.appendChild(translateButtonText);
+
     translateButton.InnerTextElement = translateButtonText;
     translateButton.TextElement = main.querySelector(QS_CONTENT_TEXT) as HTMLElement;
     return translateButton;
@@ -92,6 +92,7 @@ const commentObserver = new MutationObserver(async (mutations) => {
 
                 let translateButton = main.querySelector(QS_TRANSLATE_BUTTON);
                 if (translateButton !== null) {
+                    console.log(translateButton)
                     translateButton.reset();
                 } else {
                     main.querySelector("#expander").appendChild(document.createElement('br'));
@@ -102,5 +103,4 @@ const commentObserver = new MutationObserver(async (mutations) => {
     }
 });
 
-const observerConfig = { childList: true, subtree: true };
-commentObserver.observe(document, observerConfig);
+commentObserver.observe(document, { childList: true, subtree: true });
