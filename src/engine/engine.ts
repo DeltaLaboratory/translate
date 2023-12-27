@@ -30,7 +30,7 @@ export const getEngine = async (): Promise<TranslationEngine> => {
         await chrome.storage.local.set({engine: engine})
     }
 
-    const engineClass = AvailableEngines.find((engine) => engine.name === config.engine)
+    const engineClass = AvailableEngines.find((engineClass) => engineClass.name === engine)
     if (!engineClass) {
         throw new NotImplementedError(`Engine ${engine} is not implemented`)
     }

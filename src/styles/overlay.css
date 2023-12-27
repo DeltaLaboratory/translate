@@ -41,6 +41,19 @@
     font-family: 'Pretendard-Regular', 'Noto Sans KR', sans-serif;
 }
 
+.translate-overlay .translate-overlay-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 10px;
+}
+
+.translate-overlay .translate-overlay-header img {
+    width: 24px;
+    height: 24px;
+    margin-right: 10px;
+}
+
 .translate-overlay button {
     color: #333333;
     background-color: rgba(51, 51, 51, 0.05);

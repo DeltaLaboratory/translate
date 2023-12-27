@@ -16,19 +16,19 @@ export const ERROR_CODES = {
 
 const language: Record<string, string> = {
     "auto": "auto",
-    "ko_KR": "ko",
-    "en_US": "en",
-    "ja_JP": "ja",
-    "zh_CN": "zh-CN",
-    "zh_TW": "zh-TW",
-    "vi_VN": "vi",
-    "id_ID": "id",
-    "th_TH": "th",
-    "de_DE": "de",
-    "ru_RU": "ru",
-    "es_ES": "es",
-    "it_IT": "it",
-    "fr_FR": "fr",
+    "ko-KR": "ko",
+    "en-US": "en",
+    "ja-JP": "ja",
+    "zh-CN": "zh-CN",
+    "zh-TW": "zh-TW",
+    "vi-VN": "vi",
+    "id-ID": "id",
+    "th-TH": "th",
+    "de-DE": "de",
+    "ru-RU": "ru",
+    "es-ES": "es",
+    "it-IT": "it",
+    "fr-FR": "fr",
 }
 
 const version = 'v1.7.9_ee61e6111a'
@@ -135,7 +135,7 @@ export class Papago implements TranslationEngine {
             throw new Error(`Language ${source} or ${target} is not supported`)
         }
 
-        let result = await translateImage(image, language[source], language[source])
+        let result = await translateImage(image, language[source], language[target])
         return {
             source: source,
             target: target,
