@@ -1,5 +1,5 @@
-import {detectLang, translate, translateImage} from './papago'
-import {resizeWithMaxSize, retry} from './utils/utils'
+import {detectLang, translate, translateImage} from './engine/papago'
+import {normalizeLanguageCode, resizeWithMaxSize, retry} from './utils/utils'
 import {imageCache} from "./utils/cache";
 
 chrome.runtime.onMessage.addListener((request, _sender, sendResponse) => {
@@ -22,7 +22,6 @@ chrome.runtime.onMessage.addListener((request, _sender, sendResponse) => {
     }
     if (listener[request.action as string]) {
         listener[request.action as string](request, _sender, sendResponse).then((response) => {
-            console.debug(response)
             sendResponse(response)
         })
         return true
@@ -118,8 +117,8 @@ chrome.contextMenus.onClicked.addListener(async (info, tab) => {
 chrome.runtime.onInstalled.addListener(async () => {
     await chrome.storage.local.set({
         "honorific": false,
-        "target_lang": navigator.language,
-        "image_source_lang": 'en',
+        "target_lang": normalizeLanguageCode(navigator.language),
+        "image_source_lang": 'en-US',
         "translated_text_count": 0,
         "translated_image_count": 0
     })

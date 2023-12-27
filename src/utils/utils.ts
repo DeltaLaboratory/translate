@@ -87,3 +87,25 @@ export const normalizeUrl = (url: string) => {
         return url
     }
 }
+
+export const normalizeLanguageCode = (lang: string) => {
+    const langMap: Record<string, string> = {
+        'ko': 'ko-KR',
+        'en': 'en-US',
+        'ja': 'ja-JP',
+        'zh-CN': 'zh-CN',
+        'zh-TW': 'zh-TW',
+        'vi': 'vi-VN',
+        'id': 'id-ID',
+        'th': 'th-TH',
+        'de': 'de-DE',
+        'ru': 'ru-RU',
+        'es': 'es-ES',
+        'it': 'it-IT',
+        'fr': 'fr-FR',
+    }
+    if (lang.includes('-')) {
+        return lang
+    }
+    return langMap[lang]
+}
