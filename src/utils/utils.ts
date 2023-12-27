@@ -72,6 +72,9 @@ export const formatByteLength = (bytes: number) => {
 }
 
 export const normalizeUrl = (url: string) => {
+    if (!url) {
+        return ""
+    }
     // for //example.com like urls, add https: to the beginning
     if (url.startsWith('//')) {
         url = 'https:' + url
