@@ -3,24 +3,43 @@ import hmacSHA1 from 'crypto-js/hmac-sha1'
 import Base64 from 'crypto-js/enc-base64';
 
 import { v4 } from 'uuid'
+import {TranslationEngine} from "./engine";
 
-import {ImageTranslated, Translated, TranslationError} from "./models/papago";
-import {UnretryableError} from "./utils/utils";
-
-const version = 'v1.7.9_ee61e6111a'
-const deviceID = v4()
+import {ImageTranslated, Translated, TranslationError} from "../models/papago";
+import {ImageTranslateResult, TextTranslateResult} from "../models/engine";
+import {UnretryableError} from "../utils/utils";
 
 export const ERROR_CODES = {
     "HMAC_ERROR": "024",
     "NO_CHAR_DETECTED": "OCR12",
 }
 
+const language: Record<string, string> = {
+    "auto": "auto",
+    "ko-KR": "ko",
+    "en-US": "en",
+    "ja-JP": "ja",
+    "zh-CN": "zh-CN",
+    "zh-TW": "zh-TW",
+    "vi-VN": "vi",
+    "id-ID": "id",
+    "th-TH": "th",
+    "de-DE": "de",
+    "ru-RU": "ru",
+    "es-ES": "es",
+    "it-IT": "it",
+    "fr-FR": "fr",
+}
+
+const version = 'v1.7.9_ee61e6111a'
+const deviceID = v4()
+
+
 const padAppHash = async (url: string) => {
     const timeStampMilli = Date.now()
     const pad = Base64.stringify(hmacSHA1(`${url}${timeStampMilli}`, 'aVwDprJBYvnz1NBs8W7GBuaHQDeoynolGF5IdsxyYP6lyCzxAOG38hleJo43NnB6'))
     return `${url}?msgpad=${timeStampMilli}&md=${pad}`
 }
-
 const padWebHash = (url: string) => {
     const timeStampMilli = Date.now()
     let hash = Base64.stringify(hmacMD5(`${deviceID}\n${url}\n${timeStampMilli}`, version))
@@ -32,7 +51,6 @@ const padWebHash = (url: string) => {
     }
 }
 
-
 export const detectLang = async (text: string) => {
     const res = await fetch(`https://papago.naver.com/apis/langs/dect`, {
         method: 'POST',
@@ -42,10 +60,8 @@ export const detectLang = async (text: string) => {
         },
         body: `query=${encodeURIComponent(text)}`
     })
-    const json = await res.json()
-    return json.langCode
+    return (await res.json()).langCode
 }
-
 export const translate = async (text: string, source: string, target: string) => {
     chrome.storage.local.get(['translated_text_count'], (res) => {
         if (!res.translated_text_count) {
@@ -67,7 +83,6 @@ export const translate = async (text: string, source: string, target: string) =>
     })
     return await res.json() as Translated
 }
-
 export const translateImage = async (blob: Blob, source: string, target: string) => {
     chrome.storage.local.get(['translated_image_count'], (res) => {
         if (!res.translated_image_count) {
@@ -98,4 +113,35 @@ export const translateImage = async (blob: Blob, source: string, target: string)
     }
     response = response as ImageTranslated
     return `data:image/png;base64,${response.renderedImage}`
+}
+
+export class Papago implements TranslationEngine {
+    async translateText(text: string, source: string, target: string) {
+        if (language[source] === undefined|| language[target] === undefined) {
+            throw new Error(`Language ${source} or ${target} is not supported`)
+        }
+        let result = await translate(text, language[source], language[target])
+        return {
+            source: result.srcLangType,
+            target: result.tarLangType,
+            translatedText: result.translatedText,
+
+            engine: "papago",
+        } as TextTranslateResult
+    }
+
+    async translateImage(image: Blob, source: string, target: string) {
+        if (language[source] === undefined|| language[target] === undefined) {
+            throw new Error(`Language ${source} or ${target} is not supported`)
+        }
+
+        let result = await translateImage(image, language[source], language[target])
+        return {
+            source: source,
+            target: target,
+            translatedImage: result,
+
+            engine: "papago",
+        } as ImageTranslateResult
+    }
 }

@@ -1,6 +1,7 @@
-import {detectLang, translate, translateImage} from './papago'
-import {resizeWithMaxSize, retry} from './utils/utils'
+import {detectLang} from './engine/papago'
+import {normalizeLanguageCode, resizeWithMaxSize, retry} from './utils/utils'
 import {imageCache} from "./utils/cache";
+import {getEngine} from "./engine/engine";
 
 chrome.runtime.onMessage.addListener((request, _sender, sendResponse) => {
     const listener: Record<string, (request: any, sender: chrome.runtime.MessageSender, sendResponse: (any)) => Promise<any>> = {
@@ -14,7 +15,7 @@ chrome.runtime.onMessage.addListener((request, _sender, sendResponse) => {
             return
         },
         "translate": async (_request, _sender, _sendResponse) => {
-            return await translate(request.text, request.source, request.target)
+            return await (await getEngine()).translateText(request.text, request.source, request.target)
         },
         "detect_lang": async (_request, _sender, _sendResponse) => {
             return await detectLang(request.text)
@@ -22,7 +23,6 @@ chrome.runtime.onMessage.addListener((request, _sender, sendResponse) => {
     }
     if (listener[request.action as string]) {
         listener[request.action as string](request, _sender, sendResponse).then((response) => {
-            console.debug(response)
             sendResponse(response)
         })
         return true
@@ -70,12 +70,12 @@ chrome.contextMenus.onClicked.addListener(async (info, tab) => {
                 }] as chrome.declarativeNetRequest.Rule[],
             });
             let sourceImage = await (await fetch(imageURL.toString())).blob()
-            let image = await retry(translateImage, 5, [await resizeWithMaxSize(sourceImage, 1960, 1960), config.image_source_lang, config.target_lang])
-            await imageCache.set(info.srcUrl!, new Blob([image]))
+            let image = await retry((await getEngine()).translateImage, 5, [await resizeWithMaxSize(sourceImage, 1960, 1960), config.image_source_lang, config.target_lang])
+            await imageCache.set(info.srcUrl!, new Blob([image.translatedImage]))
             await chrome.tabs.sendMessage(tab!.id!, {
                 action: 'alter_image_url',
                 url: info.srcUrl,
-                translated_url: image
+                translated_url: image.translatedImage
             })
         } catch (e) {
             await chrome.tabs.sendMessage(tab!.id!, {
@@ -101,7 +101,7 @@ chrome.contextMenus.onClicked.addListener(async (info, tab) => {
             translateText = info.selectionText!
         }
         try {
-            let json = await translate(translateText, 'auto', config.target_lang)
+            let json = await (await getEngine()).translateText(translateText, 'auto', config.target_lang)
             await chrome.tabs.sendMessage(tab!.id!, {
                 action: 'translated_overlay',
                 translated: json
@@ -118,8 +118,8 @@ chrome.contextMenus.onClicked.addListener(async (info, tab) => {
 chrome.runtime.onInstalled.addListener(async () => {
     await chrome.storage.local.set({
         "honorific": false,
-        "target_lang": navigator.language,
-        "image_source_lang": 'en',
+        "target_lang": normalizeLanguageCode(navigator.language),
+        "image_source_lang": 'en-US',
         "translated_text_count": 0,
         "translated_image_count": 0
     })
