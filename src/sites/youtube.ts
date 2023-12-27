@@ -1,3 +1,5 @@
+import '@webcomponents/custom-elements';
+
 const QS_TRANSLATE_BUTTON = "#expander > translation-button";
 const QS_CONTENT_TEXT = "#expander>#content>#content-text";
 
@@ -61,8 +63,7 @@ class Translation extends HTMLElement {
         }
     }
 }
-
-window.customElements.define('translation-button', Translation);
+customElements.define('translation-button', Translation);
 
 const createTranslateButton = (main: HTMLElement) => {
     const translateButton = document.createElement('translation-button') as Translation;
