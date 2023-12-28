@@ -25,12 +25,14 @@ const messages: Record<string, Record<string, string>> = {
 }
 
 export const translatePage = () => {
+    const lc = normalizeLanguageCode(navigator.language)
+
     document.querySelectorAll('[data-translate]').forEach((element) => {
         const id = `@page/${element.getAttribute('data-translate')}`;
         if (id) {
-            if (messages[normalizeLanguageCode(navigator.language)]) {
+            if (messages[lc]) {
                 // @ts-ignore
-                element.innerText = messages[normalizeLanguageCode(navigator.language)][id]
+                element.innerText = messages[lc][id]
             } else {
                 // @ts-ignore
                 element.innerText = messages['en-US'][id]
@@ -39,28 +41,31 @@ export const translatePage = () => {
     })
 }
 
-export const i18n = async (id: string, ...arg: any) => {
-    const normalizedCode = normalizeLanguageCode(navigator.language)
-    console.log(normalizedCode, id)
-    if (messages[normalizedCode] && messages[normalizedCode][id]) {
-        return format(messages[normalizedCode][id], arg)
+export const i18n = async (id: string, ...arg: any[]) => {
+    const lc = normalizeLanguageCode(navigator.language)
+
+    if (messages[lc] && messages[lc][id]) {
+        return format(messages[lc][id], arg)
     } else {
         return format(messages['en-US'][id], arg)
     }
 }
 
 const format = async (text: string, args: any[]) => {
+    const lc = normalizeLanguageCode(navigator.language)
+
     let index = 0
+
     while (true) {
-        console.log(text.substring(index), args)
         let p = text.substring(index).indexOf('%')
 
         if (p === -1) {
             break
         }
+        p += text.substring(0, index).length
 
         // %%
-        if (text[p+1] === '%') {
+        if (text[p] === '%' && text[p+1] === '%') {
             text = text.slice(0, p) + text.slice(p+1)
             index = p + 1
             continue
@@ -86,14 +91,28 @@ const format = async (text: string, args: any[]) => {
             }
         }
 
+        // %localized_lang
+        // argument: string
+        // if localized_lang exists, use it
+        if (text.substring(p+1, p+15) === 'localized_lang') {
+            let arg = args.shift()
+            if (messages[lc] && messages[lc][`@lang/${arg}`]) {
+                text = text.slice(0, p) + messages[lc][`@lang/${arg}`] + text.slice(p+15)
+            } else if (LanguageLocal[arg]) {
+                text = text.slice(0, p) + LanguageLocal[arg] + text.slice(p+15)
+            } else {
+                text = text.slice(0, p) + arg + text.slice(p+15)
+            }
+        }
+
         // %lang
         if (text.substring(p+1, p+5) === 'lang') {
             const config = await chrome.storage.local.get(['target_lang']);
 
-            if (messages[normalizeLanguageCode(navigator.language)] && messages[normalizeLanguageCode(navigator.language)][`@lang/${config.target_lang}`]) {
-                text = text.slice(0, p) + LanguageLocal[normalizeLanguageCode(navigator.language)] + text.slice(p+5)
-            } else if (LanguageLocal[normalizeLanguageCode(navigator.language)]) {
-                text = text.slice(0, p) + LanguageLocal[normalizeLanguageCode(navigator.language)] + text.slice(p+5)
+            if (messages[lc] && messages[lc][`@lang/${config.target_lang}`]) {
+                text = text.slice(0, p) + LanguageLocal[lc] + text.slice(p+5)
+            } else if (LanguageLocal[lc]) {
+                text = text.slice(0, p) + LanguageLocal[lc] + text.slice(p+5)
             } else {
                 text = text.slice(0, p) + config.target_lang + text.slice(p+5)
             }

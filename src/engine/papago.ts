@@ -7,7 +7,8 @@ import {TranslationEngine} from "./engine";
 
 import {ImageTranslated, Translated, TranslationError} from "../models/papago";
 import {ImageTranslateResult, TextTranslateResult} from "../models/engine";
-import {UnretryableError} from "../utils/utils";
+import {normalizeLanguageCode, UnretryableError} from "../utils/utils";
+import {NotImplementedError} from "./errors.ts";
 
 export const ERROR_CODES = {
     "HMAC_ERROR": "024",
@@ -93,19 +94,22 @@ export const translateImage = async (blob: Blob, source: string, target: string)
         }
         throw new Error(`Failed to translate image: ${response.errorCode}/${response.errorMessage}`)
     }
-    response = response as ImageTranslated
-    return `data:image/png;base64,${response.renderedImage}`
+    return response as ImageTranslated
 }
 
 export class Papago implements TranslationEngine {
     async translateText(text: string, source: string, target: string) {
         if (language[source] === undefined|| language[target] === undefined) {
-            throw new Error(`Language ${source} or ${target} is not supported`)
+            if (language[source] === undefined) {
+                throw new NotImplementedError(`Source language ${source} is not supported`)
+            } else {
+                throw new NotImplementedError(`Target language ${target} is not supported`)
+            }
         }
         let result = await translate(text, language[source], language[target])
         return {
-            source: result.srcLangType,
-            target: result.tarLangType,
+            source: normalizeLanguageCode(result.srcLangType),
+            target: normalizeLanguageCode(result.tarLangType),
             translatedText: result.translatedText,
 
             engine: "papago",
@@ -114,14 +118,18 @@ export class Papago implements TranslationEngine {
 
     async translateImage(image: Blob, source: string, target: string) {
         if (language[source] === undefined|| language[target] === undefined) {
-            throw new Error(`Language ${source} or ${target} is not supported`)
+            if (language[source] === undefined) {
+                throw new NotImplementedError(`Source language ${source} is not supported`)
+            } else {
+                throw new NotImplementedError(`Target language ${target} is not supported`)
+            }
         }
 
         let result = await translateImage(image, language[source], language[target])
         return {
-            source: source,
-            target: target,
-            translatedImage: result,
+            source: normalizeLanguageCode(result.source),
+            target: normalizeLanguageCode(result.target),
+            translatedImage: `data:image/png;base64,${result.renderedImage}`,
 
             engine: "papago",
         } as ImageTranslateResult

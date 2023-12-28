@@ -1,17 +1,7 @@
 import {ImageTranslateResult, TextTranslateResult} from "../models/engine";
 
 import {Papago} from "./papago";
-
-export const NotImplementedError = class extends Error {
-    constructor(message?: string) {
-        super(message)
-    }
-}
-export const NotSupportedLanguageError = class extends Error {
-    constructor(message?: string) {
-        super(message)
-    }
-}
+import {NotImplementedError} from "./errors.ts";
 
 export const AvailableEngines = [
     {name: "papago", engine: Papago}

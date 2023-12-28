@@ -20,6 +20,14 @@
   "@page/cache-size":"Cache Size: %s",
   "@page/clear-cache":"Clear Cache",
 
+  "@page/close":"Close",
+  "@page/copy":"Copy",
+  "@page/copied":"Copied!",
+  "@page/translated-from-to": "%localized_lang -> %localized_lang",
+  "@page/translated-with": "Translated with %s",
+
+  "@page/show-original-image":"Original Image",
+
   "@youtube/translate":"Translate to %lang",
   "@youtube/translating":"Translating...",
   "@youtube/show-original-comment":"Show Original Comment"
