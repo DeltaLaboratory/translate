@@ -1,0 +1,34 @@
+{
+  "@lang/ko-KR":"한국어",
+  "@lang/en-US":"영어",
+  "@lang/ja-JP":"일본어",
+  "@lang/zh-CN":"중국어",
+  "@lang/zh-TW":"중국어(번체)",
+  "@lang/es-ES":"스페인어",
+  "@lang/fr-FR":"프랑스어",
+  "@lang/de-DE":"독일어",
+  "@lang/it-IT":"이탈리아어",
+  "@lang/ru-RU":"러시아어",
+  "@lang/vi-VN":"베트남어",
+  "@lang/th-TH":"태국어",
+  "@lang/id-ID":"인도네시아어",
+
+  "@page/translate-engine":"번역 엔진",
+  "@page/honorific":"존댓말",
+  "@page/image-source-language":"이미지 소스 언어",
+  "@page/target-language":"도착지 언어",
+  "@page/cache-size":"캐시 용량: %s",
+  "@page/clear-cache":"캐시 지우기",
+
+  "@page/close":"닫기",
+  "@page/copy":"복사",
+  "@page/copied":"복사 완료!",
+  "@page/translated-from-to": "%localized_lang -> %localized_lang",
+  "@page/translated-with": "%s로 번역됨",
+
+  "@page/show-original-image":"원본 이미지",
+
+  "@youtube/translate":"%lang로 번역",
+  "@youtube/translating":"번역 중...",
+  "@youtube/show-original-comment":"원본 보기"
+}

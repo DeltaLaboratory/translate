@@ -1,12 +1,12 @@
 import {formatByteLength} from "./utils/utils";
 import {imageCache} from "./utils/cache";
+import {i18n, translatePage} from "./i18n/i18n.ts";
 
 const honorificCheckbox = document.getElementById('honorific') as HTMLInputElement;
 const imageSourceSelect = document.getElementById('image_source_lang') as HTMLSelectElement;
 const targetLangSelect = document.getElementById('target_lang') as HTMLSelectElement;
 const cachePruneButton = document.getElementById('cache_prune') as HTMLButtonElement;
 
-const translatedStatus = document.getElementById('translated_status') as HTMLSpanElement;
 const cacheStatus = document.getElementById('cache_status') as HTMLSpanElement;
 
 
@@ -26,19 +26,18 @@ cachePruneButton.addEventListener('click', async () => {
     await imageCache.openWithPrune()
     await imageCache.prune(true)
     let size = await imageCache.size()
-    cacheStatus.innerText = `Cache Size: ${formatByteLength(size)}`;
+    cacheStatus.innerText = await i18n('@page/cache-size', formatByteLength(size));
 })
 
-chrome.storage.local.get(['honorific', 'image_source_lang', 'translated_text_count', 'target_lang', 'translated_image_count']).then((config) => {
+chrome.storage.local.get(['honorific', 'image_source_lang', 'target_lang']).then((config) => {
     honorificCheckbox.checked = config.honorific;
     imageSourceSelect.value = config.image_source_lang;
     targetLangSelect.value = config.target_lang;
-
-    translatedStatus.innerText = `Translated ${config.translated_text_count} texts, ${config.translated_image_count} images`;
 });
 
 document.addEventListener('DOMContentLoaded', async () => {
+    translatePage();
     await imageCache.openWithPrune();
     let size = await imageCache.size()
-    cacheStatus.innerText = `Cache Size: ${formatByteLength(size)}`;
+    cacheStatus.innerText = await i18n('@page/cache-size', formatByteLength(size));
 })

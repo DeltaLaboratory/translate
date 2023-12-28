@@ -7,7 +7,8 @@ import {TranslationEngine} from "./engine";
 
 import {ImageTranslated, Translated, TranslationError} from "../models/papago";
 import {ImageTranslateResult, TextTranslateResult} from "../models/engine";
-import {UnretryableError} from "../utils/utils";
+import {normalizeLanguageCode, UnretryableError} from "../utils/utils";
+import {NotImplementedError} from "./errors.ts";
 
 export const ERROR_CODES = {
     "HMAC_ERROR": "024",
@@ -63,15 +64,6 @@ export const detectLang = async (text: string) => {
     return (await res.json()).langCode
 }
 export const translate = async (text: string, source: string, target: string) => {
-    chrome.storage.local.get(['translated_text_count'], (res) => {
-        if (!res.translated_text_count) {
-            res.translated_text_count = 0
-        }
-        chrome.storage.local.set({
-            translated_text_count: res.translated_text_count + 1
-        })
-    })
-
     const config = await chrome.storage.local.get(['honorific'])
     const res = await fetch(`https://papago.naver.com/apis/n2mt/translate`, {
         method: 'POST',
@@ -84,15 +76,6 @@ export const translate = async (text: string, source: string, target: string) =>
     return await res.json() as Translated
 }
 export const translateImage = async (blob: Blob, source: string, target: string) => {
-    chrome.storage.local.get(['translated_image_count'], (res) => {
-        if (!res.translated_image_count) {
-            res.translated_image_count = 0
-        }
-        chrome.storage.local.set({
-            translated_image_count: res.translated_image_count + 1
-        })
-    })
-
     const formData = new FormData()
     formData.append('image', blob, 'image')
     formData.append('source', source)
@@ -111,19 +94,22 @@ export const translateImage = async (blob: Blob, source: string, target: string)
         }
         throw new Error(`Failed to translate image: ${response.errorCode}/${response.errorMessage}`)
     }
-    response = response as ImageTranslated
-    return `data:image/png;base64,${response.renderedImage}`
+    return response as ImageTranslated
 }
 
 export class Papago implements TranslationEngine {
     async translateText(text: string, source: string, target: string) {
         if (language[source] === undefined|| language[target] === undefined) {
-            throw new Error(`Language ${source} or ${target} is not supported`)
+            if (language[source] === undefined) {
+                throw new NotImplementedError(`Source language ${source} is not supported`)
+            } else {
+                throw new NotImplementedError(`Target language ${target} is not supported`)
+            }
         }
         let result = await translate(text, language[source], language[target])
         return {
-            source: result.srcLangType,
-            target: result.tarLangType,
+            source: normalizeLanguageCode(result.srcLangType),
+            target: normalizeLanguageCode(result.tarLangType),
             translatedText: result.translatedText,
 
             engine: "papago",
@@ -132,14 +118,18 @@ export class Papago implements TranslationEngine {
 
     async translateImage(image: Blob, source: string, target: string) {
         if (language[source] === undefined|| language[target] === undefined) {
-            throw new Error(`Language ${source} or ${target} is not supported`)
+            if (language[source] === undefined) {
+                throw new NotImplementedError(`Source language ${source} is not supported`)
+            } else {
+                throw new NotImplementedError(`Target language ${target} is not supported`)
+            }
         }
 
         let result = await translateImage(image, language[source], language[target])
         return {
-            source: source,
-            target: target,
-            translatedImage: result,
+            source: normalizeLanguageCode(result.source),
+            target: normalizeLanguageCode(result.target),
+            translatedImage: `data:image/png;base64,${result.renderedImage}`,
 
             engine: "papago",
         } as ImageTranslateResult

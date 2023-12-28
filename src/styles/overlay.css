@@ -18,6 +18,7 @@
     text-align: center;
     display: inline-flex;
     align-items: center;
+    z-index: 9999;
 }
 
 .image-original-button:hover {
@@ -46,6 +47,7 @@
     justify-content: space-between;
     align-items: center;
     margin-bottom: 10px;
+    user-select: none;
 }
 
 .translate-overlay .translate-overlay-header img {

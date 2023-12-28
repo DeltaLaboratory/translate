@@ -1,5 +1,7 @@
 import '@webcomponents/custom-elements';
 
+import {i18n} from "../i18n/i18n";
+
 const QS_TRANSLATE_BUTTON = "#expander > translation-button";
 const QS_CONTENT_TEXT = "#expander>#content>#content-text";
 
@@ -34,7 +36,7 @@ class Translation extends HTMLElement {
 
         switch (this.translated) {
             case true:
-                this.InnerTextElement.innerText = "Translate";
+                this.InnerTextElement.innerText = await i18n("@youtube/translate");
                 this.TextElement.innerText = this.originalText;
                 this.translated = false;
                 break;
@@ -46,7 +48,7 @@ class Translation extends HTMLElement {
                 }
 
                 this.originalText = this.TextElement.innerText;
-                this.InnerTextElement.innerText = "Translating...";
+                this.InnerTextElement.innerText = await i18n("@youtube/translating");
 
                 const config = await chrome.storage.local.get(['target_lang']);
                 let translated = await chrome.runtime.sendMessage({
@@ -58,19 +60,19 @@ class Translation extends HTMLElement {
 
                 this.translatedText = translated.translatedText;
                 this.TextElement.innerText = this.translatedText;
-                this.InnerTextElement.innerText = "Show Original Comment";
+                this.InnerTextElement.innerText = await i18n("@youtube/show-original-comment");
                 break;
         }
     }
 }
 customElements.define('translation-button', Translation);
 
-const createTranslateButton = (main: HTMLElement) => {
+const createTranslateButton = async (main: HTMLElement) => {
     const translateButton = document.createElement('translation-button') as Translation;
     translateButton.onclick = translateButton.toggle;
 
     const translateButtonText = document.createElement('span');
-    translateButtonText.innerText = 'Translate';
+    translateButtonText.innerText = await i18n("@youtube/translate");
     translateButtonText.className = 'translate-button-text more-button style-scope ytd-comment-renderer';
     translateButtonText.style.textDecoration = 'none';
     translateButtonText.style.cursor = 'pointer'
@@ -96,7 +98,7 @@ const commentObserver = new MutationObserver(async (mutations) => {
                     translateButton.reset();
                 } else {
                     main.querySelector("#expander").appendChild(document.createElement('br'));
-                    main.querySelector("#expander").appendChild(createTranslateButton(main));
+                    main.querySelector("#expander").appendChild(await createTranslateButton(main));
                 }
             }
         }

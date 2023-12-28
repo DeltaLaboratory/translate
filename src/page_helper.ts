@@ -2,6 +2,7 @@ import {normalizeUrl} from "./utils/utils";
 
 import './styles/overlay.css'
 import {TextTranslateResult} from "./models/engine.ts";
+import {i18n} from "./i18n/i18n.ts";
 
 let lastContextPosition: { x: number, y: number } = { x: 0, y: 0 }
 
@@ -10,26 +11,29 @@ document.addEventListener("contextmenu", function(event){
     lastContextPosition = { x: rect.left, y: rect.top }
 }, true);
 
-const createTranslatedOverlay = (translated: TextTranslateResult) => {
+const createTranslatedOverlay = async (translated: TextTranslateResult) => {
     const overlay = document.createElement('div')
     overlay.style.top = `${window.scrollY + lastContextPosition.y}px`
     overlay.style.left = `${window.scrollX + lastContextPosition.x}px`
 
     overlay.className = 'translate-overlay'
 
+    const header = document.createElement('div')
+    header.className = 'translate-overlay-header'
+
     // drag
     let isDragging = false
     let lastX = 0
     let lastY = 0
-    overlay.addEventListener('mousedown', (event) => {
+    header.addEventListener('mousedown', (event) => {
         isDragging = true
         lastX = event.clientX
         lastY = event.clientY
     })
-    overlay.addEventListener('mouseup', () => {
+    header.addEventListener('mouseup', () => {
         isDragging = false
     })
-    overlay.addEventListener('mousemove', (event) => {
+    header.addEventListener('mousemove', (event) => {
         if (isDragging) {
             const deltaX = event.clientX - lastX
             const deltaY = event.clientY - lastY
@@ -40,29 +44,27 @@ const createTranslatedOverlay = (translated: TextTranslateResult) => {
         }
     })
 
-    const header = document.createElement('div')
-    header.className = 'translate-overlay-header'
-
     const engineImage = document.createElement('img')
     engineImage.src = chrome.runtime.getURL(`/icon/${translated.engine}.ico`)
-    engineImage.title = `Translated with ${translated.engine}`
+    engineImage.title = await i18n(`@page/translated-with`, translated.engine)
     header.appendChild(engineImage)
 
     const headerText = document.createElement('span')
     headerText.style.fontWeight = 'bold'
-    headerText.innerText = `${translated.source} -> ${translated.target}`
+    headerText.innerText = await i18n('@page/translated-from-to', translated.source, translated.target)
     header.appendChild(headerText)
     overlay.appendChild(header)
 
     overlay.appendChild(document.createElement('hr'))
 
     const text = document.createElement('p')
+    text.style.cursor = 'text'
     text.style.marginBottom = '5px'
     text.innerText = translated.translatedText
     overlay.appendChild(text)
 
     const closeButton = document.createElement('button')
-    closeButton.innerText = 'Close'
+    closeButton.innerText = await i18n('@page/close')
     closeButton.addEventListener('click', () => {
         overlay.remove()
     })
@@ -70,12 +72,12 @@ const createTranslatedOverlay = (translated: TextTranslateResult) => {
 
     const copyButton = document.createElement('button')
     copyButton.style.marginLeft = '5px'
-    copyButton.innerText = 'Copy'
+    copyButton.innerText = await i18n('@page/copy')
     copyButton.addEventListener('click', async () => {
         await navigator.clipboard.writeText(translated.translatedText)
-        copyButton.innerText = 'Copied!'
-        setTimeout(() => {
-            copyButton.innerText = 'Copy'
+        copyButton.innerText = await i18n('@page/copied')
+        setTimeout(async () => {
+            copyButton.innerText = await i18n('@page/copy')
         }, 1000)
     })
     overlay.appendChild(copyButton)
@@ -137,8 +139,7 @@ chrome.runtime.onMessage.addListener(async (request, _sender, sendResponse) => {
 
         if (found) {
             let originalButton = document.createElement('button')
-            originalButton.innerText = "Original"
-            originalButton.title = "Show original image"
+            originalButton.innerText = await i18n('@page/show-original-image')
             originalButton.addEventListener('click', async () => {
                 if (controlElement!.getAttribute('data-original-src')) {
                     controlElement!.setAttribute('src', controlElement!.getAttribute('data-original-src')!)
@@ -165,6 +166,22 @@ chrome.runtime.onMessage.addListener(async (request, _sender, sendResponse) => {
             parentElement!.addEventListener('DOMNodeRemoved', () => {
                 originalButton.remove()
             })
+
+            // for https://github.com/WICG/navigation-api, Chromium 102+
+            // @ts-ignore
+            if (navigation) {
+                // @ts-ignore
+                navigation.addEventListener('navigate', () => {
+                    originalButton.remove()
+                })
+            }
+
+
+            // listen for changes to the page url
+            // if the page url changes, remove the original button
+            // this is to prevent the original button from staying on the page
+            // when the user navigates to a different page
+
         }
         sendResponse(found)
         return true
@@ -174,7 +191,7 @@ chrome.runtime.onMessage.addListener(async (request, _sender, sendResponse) => {
         return true
     }
     if (request.action === 'translated_overlay') {
-        document.body.appendChild(createTranslatedOverlay(request.translated as TextTranslateResult))
+        document.body.appendChild(await createTranslatedOverlay(request.translated as TextTranslateResult))
         return true
     }
     return false
