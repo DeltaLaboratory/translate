@@ -26,11 +26,15 @@
             box-sizing: border-box;
         }
 
-        .footer {
-            margin-top: auto;
-            padding: 10px;
-            display: flex;
-            justify-content: space-between;
+        button {
+            font-family: 'Pretendard-Regular', sans-serif;
+            font-size: 14px;
+            border-radius: 4px;
+            border-style: none;
+            background-color: #dfe1e4;
+            color: #1e1e1e;
+            padding: 5px 10px;
+            cursor: pointer;
         }
 
         .checkbox {
@@ -115,19 +119,19 @@
 <body>
 <div id="app">
     <div class="config-item">
-        <label for="engine">Translate Engine</label>
+        <label for="engine" data-translate="translate-engine">Translate Engine</label>
         <select id="engine">
             <option value="papago">Papago</option>
         </select>
     </div>
 
     <div class="config-item">
-        <label for="honorific">Honorific</label>
+        <label for="honorific" data-translate="honorific">Honorific</label>
         <input type="checkbox" class="checkbox" id="honorific" />
     </div>
 
     <div class="config-item">
-        <label for="image_source_lang">Image Source Language</label>
+        <label for="image_source_lang" data-translate="image-source-language">Image Source Language</label>
         <select id="image_source_lang">
             <option value="ko-KR">Korean</option>
             <option value="en-US">English</option>
@@ -144,7 +148,7 @@
     </div>
 
     <div class="config-item">
-        <label for="target_lang">Target Language</label>
+        <label for="target_lang" data-translate="target-language">Target Language</label>
         <select id="target_lang">
             <option value="ko-KR">Korean</option>
             <option value="en-US">English</option>
@@ -160,13 +164,9 @@
         </select>
     </div>
 
-    <div class="config-item">
-        <label id="cache_status">Cache Size: (measuring)KiB</label>
-        <button id="cache_prune">Clear Cache</button>
-    </div>
-
-    <div class="footer">
-        <span id="translated_status"></span>
+    <div class="config-item" >
+        <label id="cache_status" data-translate="cache-size">Cache Size: -l33t KiB</label>
+        <button id="cache_prune" data-translate="clear-cache">Clear Cache</button>
     </div>
 </div>
 

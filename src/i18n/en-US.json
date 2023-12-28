@@ -1,0 +1,26 @@
+{
+  "@lang/ko-KR":"Korean",
+  "@lang/en-US":"English",
+  "@lang/ja-JP":"Japanese",
+  "@lang/zh-CN":"Chinese",
+  "@lang/zh-TW":"Chinese (Taiwan)",
+  "@lang/es-ES":"Spanish",
+  "@lang/fr-FR":"French",
+  "@lang/de-DE":"German",
+  "@lang/it-IT":"Italian",
+  "@lang/ru-RU":"Russian",
+  "@lang/vi-VN":"Vietnamese",
+  "@lang/th-TH":"Thai",
+  "@lang/id-ID":"Indonesian",
+
+  "@page/translate-engine":"Translate Engine",
+  "@page/honorific":"Honorific",
+  "@page/image-source-language":"Image Source Language",
+  "@page/target-language":"Target Language",
+  "@page/cache-size":"Cache Size: %s",
+  "@page/clear-cache":"Clear Cache",
+
+  "@youtube/translate":"Translate to %lang",
+  "@youtube/translating":"Translating...",
+  "@youtube/show-original-comment":"Show Original Comment"
+}

@@ -120,8 +120,6 @@ chrome.runtime.onInstalled.addListener(async () => {
         "honorific": false,
         "target_lang": normalizeLanguageCode(navigator.language),
         "image_source_lang": 'en-US',
-        "translated_text_count": 0,
-        "translated_image_count": 0
     })
 
     const rules = [{
