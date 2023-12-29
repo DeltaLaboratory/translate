@@ -1,0 +1,8 @@
+translation-button {
+    user-select: none;
+}
+
+translation-button span {
+    text-decoration: none !important;
+    cursor: pointer !important;
+}

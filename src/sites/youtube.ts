@@ -2,8 +2,10 @@ import '@webcomponents/custom-elements';
 
 import {i18n} from "../i18n/i18n";
 
+import "../styles/youtube.css";
+
 const QS_TRANSLATE_BUTTON = "#expander > translation-button";
-const QS_CONTENT_TEXT = "#expander>#content>#content-text";
+const QS_CONTENT_TEXT = "#expander > #content > #content-text";
 
 class Translation extends HTMLElement {
     translated: boolean;
@@ -42,6 +44,7 @@ class Translation extends HTMLElement {
                 break;
             case false:
                 if (this.translatedText) {
+                    this.InnerTextElement.innerText = await i18n("@youtube/show-original-comment");
                     this.TextElement.innerText = this.translatedText;
                     this.translated = true;
                     return;
@@ -74,8 +77,6 @@ const createTranslateButton = async (main: HTMLElement) => {
     const translateButtonText = document.createElement('span');
     translateButtonText.innerText = await i18n("@youtube/translate");
     translateButtonText.className = 'translate-button-text more-button style-scope ytd-comment-renderer';
-    translateButtonText.style.textDecoration = 'none';
-    translateButtonText.style.cursor = 'pointer'
     translateButton.appendChild(translateButtonText);
 
     translateButton.InnerTextElement = translateButtonText;
@@ -89,7 +90,7 @@ const commentObserver = new MutationObserver(async (mutations) => {
         if (mutation.target.id === "contents") {
             for (let node of mutation.addedNodes) {
                 // @ts-ignore
-                let main = node.querySelector("#body>#main");
+                let main = node.querySelector("#body > #main");
                 if (!main) continue;
 
                 let translateButton = main.querySelector(QS_TRANSLATE_BUTTON);
