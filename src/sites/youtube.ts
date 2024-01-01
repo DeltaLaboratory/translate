@@ -24,7 +24,13 @@ class Translation extends HTMLElement {
         this.onclick = this.toggle;
     }
 
-    reset() {
+    async reset() {
+        console.log('reset translation button')
+        if (this.translated && this.InnerTextElement && this.TextElement) {
+            this.InnerTextElement.innerText = await i18n("@youtube/translate");
+            this.TextElement.innerText = this.originalText;
+        }
+
         this.translated = false;
         this.originalText = "";
         this.translatedText = "";
@@ -81,6 +87,12 @@ const createTranslateButton = async (main: HTMLElement) => {
 
     translateButton.InnerTextElement = translateButtonText;
     translateButton.TextElement = main.querySelector(QS_CONTENT_TEXT) as HTMLElement;
+
+    (new MutationObserver(async (mutations) => {
+        if (mutations.length === 0) return;
+        await translateButton.reset();
+    })).observe(main.querySelector(QS_CONTENT_TEXT) as HTMLElement, {childList: true, subtree: true});
+
     return translateButton;
 };
 
@@ -95,8 +107,7 @@ const commentObserver = new MutationObserver(async (mutations) => {
 
                 let translateButton = main.querySelector(QS_TRANSLATE_BUTTON);
                 if (translateButton !== null) {
-                    console.log(translateButton)
-                    translateButton.reset();
+                    await translateButton.reset(main.querySelector(QS_CONTENT_TEXT) as HTMLElement);
                 } else {
                     main.querySelector("#expander").appendChild(document.createElement('br'));
                     main.querySelector("#expander").appendChild(await createTranslateButton(main));
