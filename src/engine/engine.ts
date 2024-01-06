@@ -1,7 +1,7 @@
 import {ImageTranslateResult, TextTranslateResult} from "../models/engine";
 
 import {Papago} from "./papago";
-import {NotImplementedError} from "./errors.ts";
+import {NotImplementedError} from "./errors";
 
 export const AvailableEngines = [
     {name: "papago", engine: Papago}

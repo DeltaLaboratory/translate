@@ -1,0 +1,90 @@
+{
+  "lang@ko_KR":{
+    "message": "한국어"
+  },
+  "lang@en_US":{
+    "message": "영어"
+  },
+  "lang@ja_JP":{
+    "message": "일본어"
+  },
+  "lang@zh_CN": {
+    "message": "중국어(간체)"
+  },
+  "lang@zh_TW": {
+    "message": "중국어(번체)"
+  },
+  "lang@es_ES": {
+    "message": "스페인어"
+  },
+  "lang@fr_FR": {
+    "message": "프랑스어"
+  },
+  "lang@de_DE": {
+    "message": "독일어"
+  },
+  "lang@it_IT": {
+    "message": "이탈리아어"
+  },
+  "lang@ru_RU": {
+    "message": "러시아어"
+  },
+  "lang@vi_VN": {
+    "message": "베트남어"
+  },
+  "lang@th_TH": {
+    "message": "태국어"
+  },
+  "lang@id_ID": {
+    "message": "인도네시아어"
+  },
+
+  "page@translate_engine": {
+    "message": "번역 엔진"
+  },
+  "page@honorific": {
+    "message": "존댓말"
+  },
+  "page@image_source_language": {
+    "message": "원본 이미지 언어"
+  },
+  "page@target_language": {
+    "message": "번역 언어"
+  },
+  "page@cache_size": {
+    "message": "캐시 크기: $1"
+  },
+  "page@clear_cache": {
+    "message": "캐시 비우기"
+  },
+
+  "page@close": {
+    "message": "닫기"
+  },
+  "page@copy": {
+    "message": "복사"
+  },
+  "page@copied": {
+    "message": "복사 완료!"
+  },
+  "page@translated_from_to": {
+    "message": "$1에서 $2로 번역됨"
+  },
+  "page@translated_with": {
+    "message": "$1로 번역됨"
+  },
+
+  "page@show_original_image": {
+    "message": "원본 이미지 보기"
+  },
+
+  "youtube@translate": {
+    "message": "$1로 번역"
+  },
+  "youtube@translating": {
+    "message": "번역 중..."
+  },
+  "youtube@show_original_comment": {
+    "message": "원본 보기"
+  }
+}

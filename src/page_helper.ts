@@ -1,8 +1,7 @@
-import {normalizeUrl} from "./utils/utils";
+import {localizedLang, normalizeUrl} from "./utils/utils";
+import {TextTranslateResult} from "./models/engine";
 
 import './styles/overlay.css'
-import {TextTranslateResult} from "./models/engine.ts";
-import {i18n} from "./i18n/i18n.ts";
 
 let lastContextPosition: { x: number, y: number } = { x: 0, y: 0 }
 
@@ -46,12 +45,12 @@ const createTranslatedOverlay = async (translated: TextTranslateResult) => {
 
     const engineImage = document.createElement('img')
     engineImage.src = chrome.runtime.getURL(`/icon/${translated.engine}.ico`)
-    engineImage.title = await i18n(`@page/translated-with`, translated.engine)
+    engineImage.title = chrome.i18n.getMessage(`page@traslated_with`, translated.engine)
     header.appendChild(engineImage)
 
     const headerText = document.createElement('span')
     headerText.style.fontWeight = 'bold'
-    headerText.innerText = await i18n('@page/translated-from-to', translated.source, translated.target)
+    headerText.innerText = chrome.i18n.getMessage(`page@translated_from_to`, [localizedLang(translated.source), localizedLang(translated.target)])
     header.appendChild(headerText)
     overlay.appendChild(header)
 
@@ -64,7 +63,7 @@ const createTranslatedOverlay = async (translated: TextTranslateResult) => {
     overlay.appendChild(text)
 
     const closeButton = document.createElement('button')
-    closeButton.innerText = await i18n('@page/close')
+    closeButton.innerText = chrome.i18n.getMessage(`page@close`)
     closeButton.addEventListener('click', () => {
         overlay.remove()
     })
@@ -72,12 +71,12 @@ const createTranslatedOverlay = async (translated: TextTranslateResult) => {
 
     const copyButton = document.createElement('button')
     copyButton.style.marginLeft = '5px'
-    copyButton.innerText = await i18n('@page/copy')
+    copyButton.innerText = chrome.i18n.getMessage(`page@copy`)
     copyButton.addEventListener('click', async () => {
         await navigator.clipboard.writeText(translated.translatedText)
-        copyButton.innerText = await i18n('@page/copied')
+        copyButton.innerText = chrome.i18n.getMessage(`page@copied`)
         setTimeout(async () => {
-            copyButton.innerText = await i18n('@page/copy')
+            copyButton.innerText = chrome.i18n.getMessage(`page@copy`)
         }, 1000)
     })
     overlay.appendChild(copyButton)
@@ -139,7 +138,7 @@ chrome.runtime.onMessage.addListener(async (request, _sender, sendResponse) => {
 
         if (found) {
             let originalButton = document.createElement('button')
-            originalButton.innerText = await i18n('@page/show-original-image')
+            originalButton.innerText = chrome.i18n.getMessage(`page@show_original_image`)
             originalButton.addEventListener('click', async () => {
                 if (controlElement!.getAttribute('data-original-src')) {
                     controlElement!.setAttribute('src', controlElement!.getAttribute('data-original-src')!)
@@ -175,13 +174,6 @@ chrome.runtime.onMessage.addListener(async (request, _sender, sendResponse) => {
                     originalButton.remove()
                 })
             }
-
-
-            // listen for changes to the page url
-            // if the page url changes, remove the original button
-            // this is to prevent the original button from staying on the page
-            // when the user navigates to a different page
-
         }
         sendResponse(found)
         return true

@@ -1,3 +1,18 @@
+const langMap: Record<string, string> = {
+    'ko': 'ko_KR',
+    'en': 'en_US',
+    'ja': 'ja_JP',
+    'zh': 'zh_TW',
+    'vi': 'vi_VN',
+    'id': 'id_ID',
+    'th': 'th_TH',
+    'de': 'de_DE',
+    'ru': 'ru_RU',
+    'es': 'es_ES',
+    'it': 'it_IT',
+    'fr': 'fr_FR',
+}
+
 export const UnretryableError = class extends Error {
     constructor(message: string) {
         super(message)
@@ -68,7 +83,7 @@ export const formatByteLength = (bytes: number) => {
         bytes /= 1024
         unit++
     }
-    return `${bytes.toFixed(2)} ${units[unit]}`
+    return `${bytes.toFixed(2)}${units[unit]}`
 }
 
 export const normalizeUrl = (url: string) => {
@@ -89,23 +104,17 @@ export const normalizeUrl = (url: string) => {
 }
 
 export const normalizeLanguageCode = (lang: string) => {
-    const langMap: Record<string, string> = {
-        'ko': 'ko-KR',
-        'en': 'en-US',
-        'ja': 'ja-JP',
-        'zh-CN': 'zh-CN',
-        'zh-TW': 'zh-TW',
-        'vi': 'vi-VN',
-        'id': 'id-ID',
-        'th': 'th-TH',
-        'de': 'de-DE',
-        'ru': 'ru-RU',
-        'es': 'es-ES',
-        'it': 'it-IT',
-        'fr': 'fr-FR',
-    }
     if (lang.includes('-')) {
-        return lang
+        return lang.replace('-', '_')
     }
     return langMap[lang]
+}
+
+export const targetLocalized = async () => {
+    const config = await chrome.storage.local.get(['target_lang'])
+    return chrome.i18n.getMessage(`lang@${config.target_lang}`)
+}
+
+export const localizedLang = (lang: string) => {
+    return chrome.i18n.getMessage(`lang@${lang}`)
 }

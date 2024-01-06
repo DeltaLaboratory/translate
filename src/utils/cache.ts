@@ -1,4 +1,4 @@
-import {stripCommonDupe} from "./utils.ts";
+import {stripCommonDupe} from "./utils";
 
 export const imageCache = {
     db: null as IDBDatabase | null,

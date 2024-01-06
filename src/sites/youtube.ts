@@ -1,8 +1,7 @@
 import '@webcomponents/custom-elements';
 
-import {i18n} from "../i18n/i18n";
-
 import "../styles/youtube.css";
+import {targetLocalized} from "../utils/utils.ts";
 
 const QS_TRANSLATE_BUTTON = "#expander > translation-button";
 const QS_CONTENT_TEXT = "#expander > #content > #content-text";
@@ -27,7 +26,7 @@ class Translation extends HTMLElement {
     async reset() {
         console.log('reset translation button')
         if (this.translated && this.InnerTextElement && this.TextElement) {
-            this.InnerTextElement.innerText = await i18n("@youtube/translate");
+            this.InnerTextElement.innerText = chrome.i18n.getMessage("youtube@translate", await targetLocalized());
             this.TextElement.innerText = this.originalText;
         }
 
@@ -44,20 +43,20 @@ class Translation extends HTMLElement {
 
         switch (this.translated) {
             case true:
-                this.InnerTextElement.innerText = await i18n("@youtube/translate");
+                this.InnerTextElement.innerText = chrome.i18n.getMessage("youtube@translate", await targetLocalized());
                 this.TextElement.innerText = this.originalText;
                 this.translated = false;
                 break;
             case false:
                 if (this.translatedText) {
-                    this.InnerTextElement.innerText = await i18n("@youtube/show-original-comment");
+                    this.InnerTextElement.innerText = chrome.i18n.getMessage("youtube@show_original_comment");
                     this.TextElement.innerText = this.translatedText;
                     this.translated = true;
                     return;
                 }
 
                 this.originalText = this.TextElement.innerText;
-                this.InnerTextElement.innerText = await i18n("@youtube/translating");
+                this.InnerTextElement.innerText = chrome.i18n.getMessage("youtube@translating");
 
                 const config = await chrome.storage.local.get(['target_lang']);
                 let translated = await chrome.runtime.sendMessage({
@@ -69,7 +68,7 @@ class Translation extends HTMLElement {
 
                 this.translatedText = translated.translatedText;
                 this.TextElement.innerText = this.translatedText;
-                this.InnerTextElement.innerText = await i18n("@youtube/show-original-comment");
+                this.InnerTextElement.innerText = chrome.i18n.getMessage("youtube@show_original_comment");
                 break;
         }
     }
@@ -81,7 +80,7 @@ const createTranslateButton = async (main: HTMLElement) => {
     translateButton.onclick = translateButton.toggle;
 
     const translateButtonText = document.createElement('span');
-    translateButtonText.innerText = await i18n("@youtube/translate");
+    translateButtonText.innerText = chrome.i18n.getMessage("youtube@translate", await targetLocalized());
     translateButtonText.className = 'translate-button-text more-button style-scope ytd-comment-renderer';
     translateButton.appendChild(translateButtonText);
 

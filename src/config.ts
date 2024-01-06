@@ -1,6 +1,6 @@
-import {formatByteLength} from "./utils/utils";
 import {imageCache} from "./utils/cache";
-import {i18n, translatePage} from "./i18n/i18n.ts";
+
+import {formatByteLength} from "./utils/utils";
 
 const honorificCheckbox = document.getElementById('honorific') as HTMLInputElement;
 const imageSourceSelect = document.getElementById('image_source_lang') as HTMLSelectElement;
@@ -26,7 +26,7 @@ cachePruneButton.addEventListener('click', async () => {
     await imageCache.openWithPrune()
     await imageCache.prune(true)
     let size = await imageCache.size()
-    cacheStatus.innerText = await i18n('@page/cache-size', formatByteLength(size));
+    cacheStatus.innerText = chrome.i18n.getMessage(`page@cache_size`, formatByteLength(size));
 })
 
 chrome.storage.local.get(['honorific', 'image_source_lang', 'target_lang']).then((config) => {
@@ -36,8 +36,11 @@ chrome.storage.local.get(['honorific', 'image_source_lang', 'target_lang']).then
 });
 
 document.addEventListener('DOMContentLoaded', async () => {
-    translatePage();
+    document.querySelectorAll('[data-translate]').forEach((element) => {
+        console.log(element.getAttribute('data-translate'))
+        element.innerHTML = chrome.i18n.getMessage(`page@${element.getAttribute('data-translate')}`);
+    })
     await imageCache.openWithPrune();
     let size = await imageCache.size()
-    cacheStatus.innerText = await i18n('@page/cache-size', formatByteLength(size));
+    cacheStatus.innerText = chrome.i18n.getMessage(`page@cache_size`, formatByteLength(size));
 })

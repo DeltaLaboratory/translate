@@ -59,5 +59,6 @@
         "<all_urls>"
       ]
     }
-  ]
+  ],
+  "default_locale":"ko"
 }
