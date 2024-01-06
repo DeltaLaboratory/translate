@@ -118,3 +118,25 @@ export const targetLocalized = async () => {
 export const localizedLang = (lang: string) => {
     return chrome.i18n.getMessage(`lang@${lang}`)
 }
+
+export const waitForElm = async (parent: Element, selector: string): Promise<Element> =>{
+    return new Promise(resolve => {
+        let elm = parent.querySelector(selector)
+        if (elm) {
+            return resolve(elm);
+        }
+
+        const observer = new MutationObserver(() => {
+            let elm = parent.querySelector(selector);
+            if (elm) {
+                observer.disconnect();
+                resolve(elm);
+            }
+        });
+
+        observer.observe(parent, {
+            childList: true,
+            subtree: true
+        });
+    });
+}
