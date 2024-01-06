@@ -78,13 +78,13 @@
     "message": "원본 이미지 보기"
   },
 
-  "youtube@translate": {
+  "site_comment@translate": {
     "message": "$1로 번역"
   },
-  "youtube@translating": {
+  "site_comment@translating": {
     "message": "번역 중..."
   },
-  "youtube@show_original_comment": {
+  "site_comment@show_original": {
     "message": "원본 보기"
   }
 }

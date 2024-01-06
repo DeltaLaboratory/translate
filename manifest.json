@@ -39,6 +39,15 @@
     },
     {
       "matches":[
+        "*://*.pixiv.net/*"
+      ],
+      "run_at":"document_end",
+      "js":[
+        "src/sites/pixiv.ts"
+      ]
+    },
+    {
+      "matches":[
         "<all_urls>"
       ],
       "run_at":"document_end",
