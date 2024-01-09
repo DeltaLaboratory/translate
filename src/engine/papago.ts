@@ -107,6 +107,12 @@ export class Papago implements TranslationEngine {
             }
         }
         let result = await translate(text, language[source], language[target])
+
+        // same source and target language
+        if (!result.tarLangType) {
+            result.tarLangType = result.srcLangType
+        }
+        
         return {
             source: normalizeLanguageCode(result.srcLangType),
             target: normalizeLanguageCode(result.tarLangType),

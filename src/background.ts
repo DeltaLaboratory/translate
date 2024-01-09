@@ -119,7 +119,8 @@ chrome.runtime.onInstalled.addListener(async () => {
     await chrome.storage.local.set({
         "honorific": false,
         "target_lang": normalizeLanguageCode(navigator.language),
-        "image_source_lang": 'en-US',
+        "image_source_lang": 'en_US',
+        "dont_display_same_lang": false,
     })
 
     const rules = [{

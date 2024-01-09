@@ -1,7 +1,8 @@
 import '@webcomponents/custom-elements';
 
 import {TranslateButton} from "./button";
-import {targetLocalized} from "../utils/utils";
+import {normalizeLanguageCode, targetLocalized} from "../utils/utils";
+import {debug} from "../utils/log";
 
 customElements.define('translation-button', TranslateButton);
 
@@ -29,14 +30,26 @@ const commentObserver = new MutationObserver(async (mutations) => {
             let comments = node.querySelectorAll(".GBxGnK4pGIQ2sxMc")
             if (!comments) { return }
 
+            const settings = await chrome.storage.local.get(['dont_display_same_lang', 'target_lang'])
+
+            comment:
             for (let comment of comments) {
-                let commentFooter = comment.querySelector(".sjnZECjgm30vzm3b")
+                const commentFooter = comment.querySelector(".sjnZECjgm30vzm3b")
                 if (commentFooter!.querySelector("translation-button")) {
                     await commentFooter!.querySelector("translation-button")!.reset()
                 } else {
-                    let commentText = comment.querySelector(".sc-15qj8u5-0")
+                    const commentText = comment.querySelector(".sc-15qj8u5-0")
                     if (commentText.innerText === "") {
                         continue
+                    }
+                    if (settings.dont_display_same_lang) {
+                        const lang = await chrome.i18n.detectLanguage(commentText.innerText)
+                        for (let lan of lang.languages) {
+                            if (normalizeLanguageCode(lan.language) === settings.target_lang) {
+                                debug("pixiv", `Skip translating comment in ${lan.language}, ${lan.percentage}`)
+                                continue comment
+                            }
+                        }
                     }
                     commentFooter!.appendChild(await createTranslateButton(commentText))
                 }

@@ -45,6 +45,9 @@
   "page@honorific": {
     "message": "존댓말"
   },
+  "page@dont_display_same_lang": {
+    "message": "원본 언어와 번역 언어가 같을 경우 번역 버튼을 표시하지 않기"
+  },
   "page@image_source_language": {
     "message": "원본 이미지 언어"
   },
