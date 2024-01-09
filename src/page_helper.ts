@@ -1,5 +1,6 @@
 import {localizedLang, normalizeUrl} from "./utils/utils";
 import {TextTranslateResult} from "./models/engine";
+import {debug, warn} from "./utils/log.ts";
 
 import './styles/overlay.css'
 
@@ -187,4 +188,13 @@ chrome.runtime.onMessage.addListener(async (request, _sender, sendResponse) => {
         return true
     }
     return false
+})
+
+document.fonts.add(new FontFace("Pretendard Variable", `url(${chrome.runtime.getURL('/fonts/PretendardVariable.woff2')})`))
+document.fonts.load("1em Pretendard Variable").then(() => {
+    if (document.fonts.check("1em Pretendard Variable")) {
+        debug("page-helper", "dynamic font loaded")
+    } else {
+        warn("page-helper", "dynamic font not loaded")
+    }
 })
