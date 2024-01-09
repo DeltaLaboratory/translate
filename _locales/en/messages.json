@@ -1,0 +1,93 @@
+{
+  "lang@ko_KR":{
+    "message": "Korean"
+  },
+  "lang@en_US":{
+    "message": "English"
+  },
+  "lang@ja_JP":{
+    "message": "Japanese"
+  },
+  "lang@zh_CN": {
+    "message": "Chinese(Simplified)"
+  },
+  "lang@zh_TW": {
+    "message": "Chinese(Traditional)"
+  },
+  "lang@es_ES": {
+    "message": "Spanish"
+  },
+  "lang@fr_FR": {
+    "message": "French"
+  },
+  "lang@de_DE": {
+    "message": "German"
+  },
+  "lang@it_IT": {
+    "message": "Italian"
+  },
+  "lang@ru_RU": {
+    "message": "Russian"
+  },
+  "lang@vi_VN": {
+    "message": "Vietnamese"
+  },
+  "lang@th_TH": {
+    "message": "Thai"
+  },
+  "lang@id_ID": {
+    "message": "Indonesian"
+  },
+
+  "page@translate_engine": {
+    "message": "Translate Engine"
+  },
+  "page@honorific": {
+    "message": "Honorific"
+  },
+  "page@dont_display_same_lang": {
+    "message": "Don't display translate button if source and target language are same"
+  },
+  "page@image_source_language": {
+    "message": "Image Source Language"
+  },
+  "page@target_language": {
+    "message": "Target Language"
+  },
+  "page@cache_size": {
+    "message": "Cache Size: $1"
+  },
+  "page@clear_cache": {
+    "message": "Clear Cache"
+  },
+
+  "page@close": {
+    "message": "Close"
+  },
+  "page@copy": {
+    "message": "Copy"
+  },
+  "page@copied": {
+    "message": "Copied!"
+  },
+  "page@translated_from_to": {
+    "message": "Translated from $1 to $2"
+  },
+  "page@translated_with": {
+    "message": "Translated with $1"
+  },
+
+  "page@show_original_image": {
+    "message": "Show Original Image"
+  },
+
+  "site_comment@translate": {
+    "message": "Translate to $1"
+  },
+  "site_comment@translating": {
+    "message": "Translating..."
+  },
+  "site_comment@show_original": {
+    "message": "Show Original Comment"
+  }
+}
