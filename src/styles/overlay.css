@@ -27,12 +27,18 @@
     padding: 10px;
     border: 1px solid black;
     border-radius: 8px;
-    overflow: auto;
-    max-width: 500px;
+    max-width: 600px;
     max-height: 500px;
+    resize: both;
     cursor: pointer;
     font-size: 14px;
     font-family: 'Pretendard Variable', 'Noto Sans KR', sans-serif;
+}
+
+.translate-overlay .translate-overlay-body {
+    overflow: auto;
+    max-height: 400px;
+    margin-bottom: 10px;
 }
 
 .translate-overlay .translate-overlay-header {

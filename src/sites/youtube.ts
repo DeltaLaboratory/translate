@@ -12,6 +12,9 @@ const QS_CONTENT_TEXT = "#expander > #content > #content-text";
 customElements.define('translation-button', TranslateButton);
 
 const createTranslateButton = async (commentText: HTMLElement) => {
+    const clonedCommentText = commentText.cloneNode(true) as HTMLElement;
+    commentText.parentElement!.appendChild(clonedCommentText)
+
     const translateButton = document.createElement('translation-button') as TranslateButton;
     translateButton.onclick = translateButton.toggle;
 
@@ -21,12 +24,33 @@ const createTranslateButton = async (commentText: HTMLElement) => {
     translateButton.appendChild(translateButtonText);
 
     translateButton.InnerTextElement = translateButtonText;
-    translateButton.TextElement = commentText;
+    translateButton.GetOriginalText = () => commentText.innerText;
+    translateButton.SetTranslatedText = (text: string) => {
+        debug("youtube", "translate hook -> hide original text, show translated text");
+        commentText.setAttribute("is-empty", "");
+        clonedCommentText.innerText = text;
+        clonedCommentText.removeAttribute("is-empty");
+    }
+    translateButton.ShowOriginal = () => {
+        debug("youtube", "translate hook -> hide translated text, show original text");
+        commentText.removeAttribute("is-empty");
+        clonedCommentText.setAttribute("is-empty", "");
+    }
 
-    (new MutationObserver(async (mutations) => {
-        if (mutations.length === 0) return;
-        await translateButton.reset();
-    })).observe(commentText as HTMLElement, {childList: true, subtree: true});
+    // for https://github.com/WICG/navigation-api, Chromium 102+
+    // @ts-ignore
+    if (navigation) {
+        // @ts-ignore
+        navigation.addEventListener('navigate', () => {
+            commentText.removeAttribute("is-empty");
+            clonedCommentText.setAttribute("is-empty", "");
+        })
+    }
+
+    // (new MutationObserver(async (mutations) => {
+    //     if (mutations.length === 0) return;
+    //     await translateButton.reset();
+    // })).observe(commentText as HTMLElement, {childList: true, subtree: true});
 
     return translateButton;
 };

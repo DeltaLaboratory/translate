@@ -8,7 +8,11 @@ export class TranslateButton extends HTMLElement {
     originalText: string;
     translatedText: string;
 
-    TextElement: HTMLElement | undefined;
+    ToggleHook: (translated: boolean) => void
+    GetOriginalText: () => string
+    SetTranslatedText: (text: string) => void
+    ShowOriginal: () => void
+
     InnerTextElement: HTMLSpanElement | undefined;
 
     constructor() {
@@ -18,14 +22,18 @@ export class TranslateButton extends HTMLElement {
         this.translatedText = "";
 
         this.onclick = this.toggle;
+        this.ToggleHook = () => {};
+        this.GetOriginalText = () => "";
+        this.SetTranslatedText = () => {};
+        this.ShowOriginal = () => {};
     }
 
     async reset() {
         debug("translate-button", "reset translate button")
-        if (this.translated && this.InnerTextElement && this.TextElement) {
-            this.InnerTextElement.innerText = chrome.i18n.getMessage("site_comment@translate", await targetLocalized());
-            this.TextElement.innerText = this.originalText;
-        }
+        // if (this.translated && this.InnerTextElement && this.TextElement) {
+        //     this.InnerTextElement.innerText = chrome.i18n.getMessage("site_comment@translate", await targetLocalized());
+        //     this.TextElement.innerText = this.originalText;
+        // }
 
         this.translated = false;
         this.originalText = "";
@@ -33,39 +41,40 @@ export class TranslateButton extends HTMLElement {
     }
 
     async toggle() {
-        if (!this.TextElement || !this.InnerTextElement) {
-            warn("translate-button", "TextElement or InnerTextElement is undefined");
+        if (!this.InnerTextElement) {
+            warn("translate-button", "InnerTextElement is undefined");
             return;
         }
 
+        this.ToggleHook(!this.translated)
         switch (this.translated) {
             case true:
                 this.InnerTextElement.innerText = chrome.i18n.getMessage("site_comment@translate", await targetLocalized());
-                this.TextElement.innerText = this.originalText;
+                this.ShowOriginal();
                 this.translated = false;
                 break;
             case false:
                 if (this.translatedText) {
                     this.InnerTextElement.innerText = chrome.i18n.getMessage("site_comment@show_original");
-                    this.TextElement.innerText = this.translatedText;
+                    this.SetTranslatedText(this.translatedText)
                     this.translated = true;
                     return;
                 }
 
-                this.originalText = this.TextElement.innerText;
                 this.InnerTextElement.innerText = chrome.i18n.getMessage("site_comment@translating");
 
                 const config = await chrome.storage.local.get(['target_lang']);
                 let translated = await chrome.runtime.sendMessage({
                     action: 'translate',
-                    text: this.originalText,
+                    text: this.GetOriginalText(),
                     source: 'auto',
                     target: config.target_lang
                 })
 
                 this.translatedText = translated.translatedText;
-                this.TextElement.innerText = this.translatedText;
+                this.SetTranslatedText(this.translatedText);
                 this.InnerTextElement.innerText = chrome.i18n.getMessage("site_comment@show_original");
+                this.translated = true;
                 break;
         }
     }

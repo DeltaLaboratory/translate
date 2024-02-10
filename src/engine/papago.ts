@@ -71,7 +71,7 @@ export const translate = async (text: string, source: string, target: string) =>
             ...padWebHash('https://papago.naver.com/apis/n2mt/translate'),
             'Content-Type': 'application/x-www-form-urlencoded',
         },
-        body: `deviceId=${deviceID}&locale=${source}&agree=false&dict=false&dictDisplay=30&honorific=${config.honorific}&instant=true&paging=false&source=${source}&target=${target}&text=${text}`
+        body: `deviceId=${deviceID}&locale=${source}&agree=false&dict=false&dictDisplay=30&honorific=${config.honorific}&instant=true&paging=false&source=${source}&target=${target}&text=${encodeURIComponent(text)}`
     })
     return await res.json() as Translated
 }

@@ -33,7 +33,7 @@ const createTranslatedOverlay = async (translated: TextTranslateResult) => {
     header.addEventListener('mouseup', () => {
         isDragging = false
     })
-    header.addEventListener('mousemove', (event) => {
+    document.addEventListener('mousemove', (event) => {
         if (isDragging) {
             const deltaX = event.clientX - lastX
             const deltaY = event.clientY - lastY
@@ -58,8 +58,8 @@ const createTranslatedOverlay = async (translated: TextTranslateResult) => {
     overlay.appendChild(document.createElement('hr'))
 
     const text = document.createElement('p')
+    text.className = 'translate-overlay-body'
     text.style.cursor = 'text'
-    text.style.marginBottom = '5px'
     text.innerText = translated.translatedText
     overlay.appendChild(text)
 

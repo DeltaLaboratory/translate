@@ -17,7 +17,15 @@ const createTranslateButton = async (commentText: HTMLDivElement) => {
 
     translateButton.appendChild(translateButtonText);
     translateButton.InnerTextElement = translateButtonText;
-    translateButton.TextElement = commentText;
+
+    let originalText = commentText.innerText;
+    translateButton.GetOriginalText = () => commentText.innerText;
+    translateButton.SetTranslatedText = (text: string) => {
+        commentText.innerText = text;
+    }
+    translateButton.ShowOriginal = () => {
+        commentText.innerText = originalText;
+    }
     return translateButton;
 }
 
