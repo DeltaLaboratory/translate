@@ -46,7 +46,10 @@ const commentObserver = new MutationObserver(async (mutations) => {
                 if (commentFooter!.querySelector("translation-button")) {
                     await commentFooter!.querySelector("translation-button")!.reset()
                 } else {
-                    const commentText = comment.querySelector(".sc-15qj8u5-0")
+                    let commentText = comment.querySelector(".sc-15qj8u5-0")
+                    if (commentText.querySelector(".sc-eyxzap-1")) {
+                        commentText = commentText.querySelector(".sc-eyxzap-1")!
+                    }
                     if (commentText.innerText === "") {
                         continue
                     }
